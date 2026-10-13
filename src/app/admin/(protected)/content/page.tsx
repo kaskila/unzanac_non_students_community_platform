@@ -41,7 +41,7 @@ export default async function SiteContentPage() {
 
       {section("hero", <>
         <TextField name="title" label={t("hero.heading")} hint={t("hero.headingHint")} maxLength={80} defaultValue={site.hero.title} />
-        <TextArea name="body" label={t("hero.body")} rows={3} maxLength={300} defaultValue={site.hero.body} />
+        <TextArea id="field-hero-body" name="body" label={t("hero.body")} rows={3} maxLength={300} defaultValue={site.hero.body} />
       </>)}
 
       {section("location", <>
@@ -51,7 +51,7 @@ export default async function SiteContentPage() {
       </>)}
 
       {section("visit", <>
-        <TextArea name="body" label={t("visit.body")} hint={t("markdownHint")} rows={10} maxLength={4000} defaultValue={site.visit.body} />
+        <TextArea id="field-visit-body" name="body" label={t("visit.body")} hint={t("markdownHint")} rows={10} maxLength={4000} defaultValue={site.visit.body} />
       </>)}
 
       {section("contacts", <>
@@ -102,7 +102,7 @@ export default async function SiteContentPage() {
         </p>
         <p className={ui.muted}>{t("privacy.intro")}</p>
         <ActionForm action={publishPrivacyAction} savedMessage={t("privacy.published")}>
-          <TextArea name="body" label={t("privacy.body")} hint={t("markdownHint")} rows={14} maxLength={20000} defaultValue={privacy?.body} />
+          <TextArea id="field-privacy-body" name="body" label={t("privacy.body")} hint={t("markdownHint")} rows={14} maxLength={20000} defaultValue={privacy?.body} />
           <SubmitButton>{t("privacy.publish")}</SubmitButton>
         </ActionForm>
       </section>

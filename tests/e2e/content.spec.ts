@@ -1,10 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { toLocalInput } from "../../src/lib/dates";
-import { acceptInvite, alertMessage, enrolTwoFactor, inviteOwner, signIn } from "./helpers";
+import { acceptInvite, alertMessage, enrolTwoFactor, inviteAdmin, signIn } from "./helpers";
 
 // M2 exit criteria (docs/PLAN.md §11): journeys 1 and 2, plus accessibility on every public page.
-const OWNER = { email: "content-owner@example.org", name: "Content Owner", password: "content-password-123" };
+// A register officer can manage content and site content. Using one (not an owner) keeps the
+// "first owner" bootstrap in admin.spec.ts independent of this file.
+const ADMIN = { email: "officer@example.org", name: "Content Officer", password: "officer-password-123" };
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 test.describe.configure({ mode: "serial" });
@@ -12,11 +14,13 @@ test.describe.configure({ mode: "serial" });
 let admin: Page;
 
 test.beforeAll(async ({ browser }) => {
-  admin = await (await browser.newContext()).newPage();
-  await acceptInvite(admin, inviteOwner(OWNER.email, OWNER.name), OWNER.name, OWNER.password);
-  await signIn(admin, OWNER.email, OWNER.password);
-  await enrolTwoFactor(admin, OWNER.password);
-  await expect(admin.getByRole("heading", { name: `Welcome, ${OWNER.name}` })).toBeVisible();
+  // Its own client address, so this file's sign-in doesn't use up admin.spec.ts's sign-in rate limit
+  // (5 per minute per address, src/server/auth.ts) when both run in parallel.
+  admin = await (await browser.newContext({ extraHTTPHeaders: { "x-forwarded-for": "198.51.100.20" } })).newPage();
+  await acceptInvite(admin, inviteAdmin(ADMIN.email, ADMIN.name, "register_officer"), ADMIN.name, ADMIN.password);
+  await signIn(admin, ADMIN.email, ADMIN.password);
+  await enrolTwoFactor(admin, ADMIN.password);
+  await expect(admin.getByRole("heading", { name: `Welcome, ${ADMIN.name}` })).toBeVisible();
 });
 
 test.afterAll(async () => {
@@ -30,7 +34,9 @@ async function expectNoAxeViolations(page: Page) {
 
 test("journey 1: an admin publishes an announcement and it appears on the home page", async ({ page }) => {
   await admin.getByRole("navigation", { name: "Admin menu" }).getByRole("link", { name: "Announcements" }).click();
+  await expect(admin.getByRole("heading", { level: 1, name: "Announcements" })).toBeVisible();
   await admin.getByRole("link", { name: "New announcement" }).click();
+  await expect(admin.getByRole("heading", { level: 1, name: "New announcement" })).toBeVisible();
 
   // Validation errors are listed at the top and the typed text is kept.
   await admin.getByLabel("Title").fill("Youth day: sports & fellowship");
@@ -47,6 +53,7 @@ test("journey 1: an admin publishes an announcement and it appears on the home p
 
   // A draft must not appear publicly.
   await admin.getByRole("link", { name: "New announcement" }).click();
+  await expect(admin.getByRole("heading", { level: 1, name: "New announcement" })).toBeVisible();
   await admin.getByLabel("Title").fill("Draft notice");
   await admin.getByLabel("Text", { exact: true }).fill("Not ready yet.");
   await admin.getByRole("button", { name: "Save draft" }).click();
@@ -54,11 +61,11 @@ test("journey 1: an admin publishes an announcement and it appears on the home p
 
   await page.goto("/");
   const section = page.getByRole("region", { name: "Announcements" });
-  await expect(section.getByRole("link", { name: "Youth day: sports & fellowship" })).toBeVisible();
+  await expect(section.getByRole("link", { name: "Youth day: sports & fellowship", exact: true })).toBeVisible();
   await expect(section).not.toContainText("Draft notice");
   await expect(section.getByRole("link", { name: /Share on WhatsApp/ })).toHaveAttribute("href", /^https:\/\/wa\.me\/\?text=/);
 
-  await section.getByRole("link", { name: "Youth day: sports & fellowship" }).click();
+  await section.getByRole("link", { name: "Youth day: sports & fellowship", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Youth day: sports & fellowship" })).toBeVisible();
   await expect(page.locator(".prose strong")).toHaveText("14:00");
   await expect(page.getByText("Youth ·")).toBeVisible();
@@ -122,6 +129,8 @@ test("journey 2: a weekly service feeds the next service card, the schedule and 
 
 test("site content edits appear on the public site", async ({ page }) => {
   await admin.goto("/admin/content");
+  await expect(admin.getByRole("heading", { level: 1, name: "Site content" })).toBeVisible();
+  await expectNoAxeViolations(admin);
   const contacts = admin.getByRole("region", { name: "Contacts" });
   await contacts.getByLabel("Role").first().fill("Rector");
   await contacts.getByLabel("Name").first().fill("Pr. Mwila");

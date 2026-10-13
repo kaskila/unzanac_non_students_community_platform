@@ -30,6 +30,18 @@ export function inviteOwner(email: string, name: string): string {
   return link;
 }
 
+/** Invite link for an admin of any role (test-only script, see invite-admin.ts). */
+export function inviteAdmin(email: string, name: string, role: "owner" | "register_officer" | "editor"): string {
+  const output = execSync(`npx tsx tests/e2e/invite-admin.ts ${email} "${name}" ${role}`, {
+    env: { ...process.env, ...e2eEnv },
+    encoding: "utf8",
+  });
+  const link = output.match(/https?:\/\/\S+\/admin\/invite\/\S+/)?.[0];
+  if (!link) throw new Error(`No invite link in output:
+${output}`);
+  return link;
+}
+
 export async function acceptInvite(page: Page, link: string, name: string, password: string) {
   await page.goto(link);
   await page.getByLabel("Your name").fill(name);
