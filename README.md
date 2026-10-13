@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UNZANAC Community Platform
 
-## Getting Started
+The website and admin platform for the UNZA congregation of the New Apostolic Church: announcements, events, committees, media, resources and the member register.
 
-First, run the development server:
+- **Plan:** [docs/PLAN.md](docs/PLAN.md) (Phase 1 spec) · [docs/ROADMAP.md](docs/ROADMAP.md) (Phases 0–4)
+- **How the technology works:** [docs/TECH.md](docs/TECH.md)
+- **Decisions:** [docs/decisions/](docs/decisions/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Requirements
+
+- Node.js 20.9 or later (CI uses Node 24)
+- PostgreSQL 17 for local development: installed on your PC (recommended), or Docker (optional)
+
+## Databases
+
+| Environment | Database |
+|---|---|
+| Local | PostgreSQL 17 on your PC (or Docker via `docker-compose.yml`) |
+| CI | Postgres 17 service container in GitHub Actions |
+| Staging / production | [Neon](https://neon.tech): separate projects or branches for staging and production |
+
+## First-time setup
+
+### 1. Local PostgreSQL
+
+Install PostgreSQL 17 (Windows installer from postgresql.org; skip Stack Builder). Then open **SQL Shell (psql)** or pgAdmin's Query Tool as the `postgres` user and run:
+
+```sql
+CREATE USER unzanac WITH PASSWORD 'unzanac_dev' CREATEDB;
+CREATE DATABASE unzanac OWNER unzanac;
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`CREATEDB` is required: `prisma migrate dev` creates a temporary "shadow" database to check migrations.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+*Using Docker instead?* Run `npm run db:up`; it creates the same user and database.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2. App
 
-## Learn More
+```bash
+npm install                 # also generates the Prisma client
+cp .env.example .env        # local settings; never commit .env
+npm run db:migrate          # apply migrations
+npm run db:seed             # add the nine committees
+npm run dev                 # http://localhost:3000
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Neon (staging and production)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Set these in the hosting provider's environment variables, never in the repo:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `DATABASE_URL`: Neon's **pooled** connection string (host contains `-pooler`), used by the app.
+- `DIRECT_URL`: Neon's **direct** connection string, used by `prisma migrate deploy`.
 
-## Deploy on Vercel
+Choose the Neon region closest to Zambia that Neon offers, and run the app's server functions in the same region.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Everyday commands
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command | What it does |
+|---|---|
+| `npm run dev` | Development server with hot reload |
+| `npm run check` | Lint + type check + unit tests (run before every push) |
+| `npm run build` | Production build |
+| `npm run test:e2e` | Playwright tests at phone size (360 px), accessibility (axe) and the home page byte budget. Run `npm run build` first |
+| `npm run db:migrate -- --name <change>` | Create and apply a migration after editing `prisma/schema.prisma` |
+| `npm run db:studio` | Browse the local database |
+| `npm run db:up` / `db:down` | Start / stop the optional Docker database |
+| `npm run icons` | Regenerate app icons from `docs/brand/` |
+
+First time running E2E tests: `npx playwright install chromium`.
+
+## Project layout
+
+```
+src/app/            pages and routes (Next.js App Router)
+src/components/     UI components (public/, later admin/ and ui/)
+src/server/         server-only code: database client, later auth, policy, services
+src/lib/            shared helpers: brand palette, committees, site settings
+src/messages/       all user-facing text (en.json; Bemba and Nyanja in Phase 3)
+src/i18n/           next-intl configuration
+prisma/             schema, migrations, seed
+tests/unit/         Vitest
+tests/e2e/          Playwright
+docs/               plan, roadmap, technology guide, decisions, brand assets
+```
+
+## Rules of the road
+
+- **Brand colours come from tokens** (`bg-azure-700`, `text-ink`, …), never raw hex. Tailwind's default palette is switched off. Don't use `azure-500` for text smaller than 24 px. See [PLAN.md §3.3](docs/PLAN.md#33-brand-and-visual-design).
+- **All text goes in `src/messages/en.json`**, not in components.
+- **Server Components by default.** Add `"use client"` only when the phone really needs interactivity; every client component costs data for members.
+- **Every change passes CI:** lint, types, unit tests, build, E2E at 360 px, axe (WCAG 2.2 AA), byte budget and Lighthouse.
+- **This Next.js version differs from older docs and tutorials.** Read the guides bundled in `node_modules/next/dist/docs/` (see `AGENTS.md`).

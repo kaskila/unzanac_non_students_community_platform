@@ -718,11 +718,11 @@ model AuditLog {
 
 | Environment | Purpose | Database |
 |---|---|---|
-| Local | Development | Postgres in Docker, seeded |
-| Staging | Testing on real phones, demos | Managed Postgres (staging) |
-| Production | Live | Managed Postgres (production) with point-in-time recovery |
+| Local | Development | PostgreSQL 17 on the developer's PC (Docker optional), seeded |
+| Staging | Testing on real phones, demos | Neon (staging branch or project) |
+| Production | Live | Neon (production) with point-in-time recovery |
 
-- **Hosting (recommended to start):** Vercel for the app, with server functions in the **same region as the database**, plus a managed Postgres provider in the nearest region available (Cape Town if offered, otherwise Frankfurt or London). Cached public pages are served from African edge locations, so the database distance mainly affects admin pages and form submissions.
+- **Hosting (recommended to start):** Vercel for the app, with server functions in the **same region as the database**, plus **Neon** Postgres in the nearest region Neon offers. The app connects through Neon's **pooled** URL (`DATABASE_URL`); migrations use the **direct** URL (`DIRECT_URL`). Cached public pages are served from African edge locations, so the database distance mainly affects admin pages and form submissions.
 - **CI/CD (GitHub Actions):** install → lint → typecheck → unit tests → build → e2e + axe → Lighthouse. Main is protected and needs green CI; merging deploys to staging; a tagged release promotes to production.
 - **Migrations:** `prisma migrate deploy` runs on deploy. Data-changing migrations need a written rollback note.
 - **Cron (daily):** delete expired tokens and old spam, close campaigns, apply retention rules, import new YouTube uploads as drafts, purge soft-deleted R2 objects older than 30 days.
@@ -739,7 +739,7 @@ Estimates assume one developer working about 20–25 hours a week. Each mileston
 
 | # | Milestone | Weeks | Deliverables | Exit criteria |
 |---|---|---|---|---|
-| **M0** | Foundation | 1 | Repo, Next 16 + Tailwind + Prisma 7 + next-intl, Docker Postgres, seed, CI pipeline with every check, Sentry, staging deploy, ADR-001 (stack) | Push to main → green CI → staging; empty home page within budget (or budget decision recorded) |
+| **M0** | Foundation | 1 | Repo, Next 16 + Tailwind + Prisma 7 + next-intl, local Postgres (Docker optional), seed, CI pipeline with every check, Sentry, staging deploy, ADR-001 (stack) | Push to main → green CI → staging; empty home page within budget (or budget decision recorded) |
 | **M1** | Admin access | 1 | Better Auth email + password + required TOTP, invite links, roles, `policy.ts` + matrix tests, admin layout, admin users screen, audit log | Owner invites an Editor; Editor is blocked from register routes (tested) |
 | **M2** | Content + public site | 2 | Site content, committees, announcements (schedule, pin, expiry, share text), events (rrule, exceptions, .ics), all public pages, caching + revalidation, privacy notice | Journeys 1 & 2 pass; Lighthouse and axe green |
 | **M2b** | Media + resources | 1 | Video model, YouTube link parsing + oEmbed, tap-to-play player, Watch pages, channel RSS import to drafts, Facebook link cards, R2 setup, direct uploads, file checks, Resources pages, signed downloads, versions, counts, live banner | Journeys 7 & 8 pass; home page still within budget with the featured video |

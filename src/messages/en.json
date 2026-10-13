@@ -1,0 +1,24 @@
+{
+  "Site": {
+    "name": "UNZANAC",
+    "tagline": "New Apostolic Church · UNZA Congregation",
+    "description": "News, services, committees and resources for the UNZA congregation of the New Apostolic Church.",
+    "skipToContent": "Skip to main content",
+    "emblemAlt": "New Apostolic Church emblem"
+  },
+  "Home": {
+    "heroTitle": "Welcome to UNZANAC",
+    "heroBody": "Whether you live, work or study near UNZA, or are visiting for the first time, you belong here.",
+    "nextServiceTitle": "Next service",
+    "nextServicePending": "Service times will be published here soon.",
+    "committeesTitle": "Committees",
+    "committeesIntro": "Our congregation serves through these committees. Ask any minister how to join one.",
+    "watchTitle": "Watch and listen",
+    "watchBody": "Choir, music and services from the UNZANAC Music Department.",
+    "watchLink": "Watch on YouTube"
+  },
+  "Footer": {
+    "follow": "Follow us",
+    "youtube": "YouTube"
+  }
+}

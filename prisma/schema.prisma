@@ -1,0 +1,26 @@
+// UNZANAC platform schema. Full target model: docs/PLAN.md §7.
+// Models are added milestone by milestone; M0 starts with committees.
+// Convention: every DateTime is stored as timestamptz (UTC) and shown in Africa/Lusaka.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Committee {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  description  String?
+  meetingInfo  String?
+  contactName  String?
+  contactPhone String? // E.164
+  sortOrder    Int      @default(0)
+  isPublic     Boolean  @default(true)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+}

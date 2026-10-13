@@ -140,7 +140,7 @@ This guide explains which technologies the platform uses, why each was chosen, a
 | Service | Role | Why |
 |---|---|---|
 | **Vercel** | Runs the app; serves cached pages from edge locations, including in Africa | Simplest Next.js hosting, free tier, automatic deploys from GitHub |
-| **Managed Postgres** (e.g. Neon) | Database with automatic backups and point-in-time recovery | No server maintenance |
+| **Neon** (managed Postgres 17) | Staging and production database with automatic backups, point-in-time recovery and branching | No server maintenance; the app uses the pooled connection, migrations use the direct one |
 | **Vercel Cron** | Daily jobs: expire tokens, retention cleanup, YouTube import, purge deleted files | No separate server |
 | **GitHub + GitHub Actions** | Source code and CI | Nothing reaches production without passing the checks |
 | **Sentry** | Error reporting, with request bodies and cookies stripped | Find bugs before members report them |
@@ -148,7 +148,7 @@ This guide explains which technologies the platform uses, why each was chosen, a
 
 **Regions:** server functions run in the **same region as the database**. Cached public pages are served from the CDN location nearest the visitor.
 
-**Environments:** local (Postgres in Docker) → staging → production. Each has its own database and R2 bucket.
+**Environments:** local (PostgreSQL 17 installed on the PC; Docker optional) → staging → production (Neon). Each has its own database and R2 bucket. Each has its own database and R2 bucket.
 
 ---
 
@@ -209,7 +209,7 @@ Visitor taps Download ──► /resources/<slug>/download ──► count++ ─
 
 | Item | Expected cost |
 |---|---|
-| Vercel, managed Postgres, Cloudflare R2 + Turnstile, Sentry, GitHub, YouTube | Free tiers, expected to be enough for a congregation of this size |
+| Vercel, Neon, Cloudflare R2 + Turnstile, Sentry, GitHub, YouTube | Free tiers, expected to be enough for a congregation of this size |
 | Domain name | About US$10–20 a year |
 | SMS | None in Phase 1 (from Phase 2, only if chosen) |
 

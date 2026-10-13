@@ -1,26 +1,52 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Brand tokens (docs/PLAN.md §3.3). Tailwind's default palette is cleared so only these colours exist:
+ * use bg-azure-700, text-ink, etc. Values must match src/lib/brand.ts (checked by tests/unit/brand.test.ts).
+ * Never use azure-500 or lighter for text smaller than 24px on white.
+ */
+@theme {
+  --color-*: initial;
+  --color-azure-50: #eef5fb;
+  --color-azure-100: #d9e8f5;
+  --color-azure-300: #86b3dc;
+  --color-azure-500: #5793c9;
+  --color-azure-700: #2f6fa8;
+  --color-azure-900: #1f4f7a;
+  --color-white: #ffffff;
+  --color-ink: #1a2433;
+  --color-muted: #5b6675;
+  --color-line: #e6edf4;
+  --color-success: #1d6b40;
+  --color-warning: #8a5300;
+  --color-danger: #b42318;
+
+  /* System fonts only: no font downloads on mobile data. */
+  --font-sans:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    background-color: var(--color-white);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+  }
+
+  a {
+    color: var(--color-azure-700);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-azure-500);
+    outline-offset: 2px;
+  }
 }
