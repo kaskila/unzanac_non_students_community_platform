@@ -1,8 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-// Budget from docs/PLAN.md §9: the home page must transfer no more than 150 KB.
-const HOME_BUDGET_BYTES = 150 * 1024;
+// Byte budgets from docs/decisions/0002-home-page-budget.md.
+const BUDGET = {
+  criticalPath: 50 * 1024, // HTML + CSS + images: what decides how fast the page appears on 3G
+  firstVisit: 200 * 1024, // everything, including the framework JavaScript (cached for a year)
+  repeatVisit: 20 * 1024, // second visit with a warm browser cache
+};
 
 test("home page shows the welcome, committees and YouTube link", async ({ page }) => {
   await page.goto("/");
@@ -29,13 +33,34 @@ test("home page fits a 360px screen without sideways scrolling", async ({ page }
   expect(overflow).toBeLessThanOrEqual(0);
 });
 
-test("home page stays within the 150 KB transfer budget", async ({ page }) => {
-  const responses: Promise<number>[] = [];
-  page.on("requestfinished", (request) => {
-    responses.push(request.sizes().then((s) => s.responseBodySize + s.responseHeadersSize));
-  });
-  await page.goto("/", { waitUntil: "networkidle" });
-  const total = (await Promise.all(responses)).reduce((sum, bytes) => sum + bytes, 0);
-  console.log(`Home page transferred ${(total / 1024).toFixed(1)} KB across ${responses.length} requests`);
-  expect(total).toBeLessThanOrEqual(HOME_BUDGET_BYTES);
+test("home page stays within its byte budgets", async ({ page }) => {
+  const first = await measureTransfer(page, () => page.goto("/", { waitUntil: "networkidle" }));
+  const repeat = await measureTransfer(page, () => page.goto("/", { waitUntil: "networkidle" }));
+
+  const kb = (bytes: number) => `${(bytes / 1024).toFixed(1)} KB`;
+  console.log(
+    `Home page: critical path ${kb(first.critical)}, first visit ${kb(first.total)}, repeat visit ${kb(repeat.total)}`,
+  );
+  expect(first.critical, "critical path (HTML + CSS + images)").toBeLessThanOrEqual(BUDGET.criticalPath);
+  expect(first.total, "first visit").toBeLessThanOrEqual(BUDGET.firstVisit);
+  expect(repeat.total, "repeat visit").toBeLessThanOrEqual(BUDGET.repeatVisit);
 });
+
+/** Bytes actually sent over the network (0 for responses served from the browser cache). */
+async function measureTransfer(page: Page, navigate: () => Promise<unknown>) {
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send("Network.enable");
+  const types = new Map<string, string>();
+  let total = 0;
+  let critical = 0;
+  cdp.on("Network.responseReceived", (e) => types.set(e.requestId, e.type));
+  cdp.on("Network.loadingFinished", (e) => {
+    total += e.encodedDataLength;
+    if (["Document", "Stylesheet", "Image", "Font"].includes(types.get(e.requestId) ?? "")) {
+      critical += e.encodedDataLength;
+    }
+  });
+  await navigate();
+  await cdp.detach();
+  return { total, critical };
+}

@@ -5,6 +5,7 @@ The website and admin platform for the UNZA congregation of the New Apostolic Ch
 - **Plan:** [docs/PLAN.md](docs/PLAN.md) (Phase 1 spec) · [docs/ROADMAP.md](docs/ROADMAP.md) (Phases 0–4)
 - **How the technology works:** [docs/TECH.md](docs/TECH.md)
 - **Decisions:** [docs/decisions/](docs/decisions/)
+- **Where the work stands:** [docs/STATUS.md](docs/STATUS.md) · **Working from several machines:** [docs/WORKING-ACROSS-MACHINES.md](docs/WORKING-ACROSS-MACHINES.md)
 
 ## Requirements
 
@@ -44,12 +45,28 @@ npm run db:seed             # add the nine committees
 npm run dev                 # http://localhost:3000
 ```
 
+### 3. First admin (owner)
+
+Admin accounts are invite-only, and two-step sign-in (an authenticator app) is required. Create the first owner's invite link:
+
+```bash
+npm run admin:invite-owner -- you@example.com "Your Name"
+```
+
+Open the printed link, set a password, sign in, and scan the QR code with an authenticator app (Google Authenticator, Microsoft Authenticator or similar). Owners invite everyone else from **/admin/users**. The script refuses to run once an active owner exists.
+
+### E2E tests and the test database
+
+`npm run test:e2e` runs against a **separate database, `unzanac_test`**, which is **dropped and recreated on every run** (`tests/e2e/global-setup.ts`). The setup refuses any database whose name doesn't end in `_test`. Override it with `E2E_DATABASE_URL`. Your development database is never touched.
+
 ### Neon (staging and production)
 
 Set these in the hosting provider's environment variables, never in the repo:
 
 - `DATABASE_URL`: Neon's **pooled** connection string (host contains `-pooler`), used by the app.
 - `DIRECT_URL`: Neon's **direct** connection string, used by `prisma migrate deploy`.
+- `BETTER_AUTH_SECRET`: a long random value, different for each environment.
+- `BETTER_AUTH_URL`: the site's public URL, e.g. `https://unzanac.org`.
 
 Choose the Neon region closest to Zambia that Neon offers, and run the app's server functions in the same region.
 

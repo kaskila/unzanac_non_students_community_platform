@@ -20,5 +20,147 @@
   "Footer": {
     "follow": "Follow us",
     "youtube": "YouTube"
+  },
+  "Admin": {
+    "title": "UNZANAC Admin",
+    "loading": "Loading…",
+    "roles": {
+      "owner": "Owner",
+      "register_officer": "Register officer",
+      "editor": "Editor"
+    },
+    "nav": {
+      "label": "Admin menu",
+      "dashboard": "Dashboard",
+      "register": "Register",
+      "users": "Admin users",
+      "audit": "Audit log",
+      "viewSite": "View site",
+      "signOut": "Sign out"
+    },
+    "login": {
+      "title": "Admin sign in",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "working": "Signing in…",
+      "invalid": "Email or password is incorrect.",
+      "notEmail": "Sign in with your full email address, for example name@example.com.",
+      "blocked": "This account is deactivated. Contact an owner.",
+      "tooMany": "Too many attempts. Wait a minute and try again.",
+      "generic": "Something went wrong. Please try again.",
+      "accountReady": "Your account is ready. Sign in to continue."
+    },
+    "verify": {
+      "title": "Enter your code",
+      "body": "Open your authenticator app and enter the 6-digit code for UNZANAC Admin.",
+      "code": "6-digit code",
+      "backupCode": "Backup code",
+      "submit": "Verify",
+      "useBackup": "Use a backup code instead",
+      "useApp": "Use the authenticator app instead",
+      "invalid": "That code didn't work. Check that your phone's clock is correct and try again.",
+      "expired": "Sign-in took too long. Please sign in again.",
+      "locked": "Too many wrong codes. Wait 15 minutes, then sign in again."
+    },
+    "setup": {
+      "title": "Set up two-step sign-in",
+      "intro": "Every admin account is protected by an authenticator app, such as Google Authenticator or Microsoft Authenticator. You'll need it each time you sign in.",
+      "password": "Confirm your password",
+      "start": "Continue",
+      "scan": "Scan this QR code with your authenticator app.",
+      "qrAlt": "QR code for your authenticator app",
+      "manualKey": "Can't scan it? Enter this key in the app instead:",
+      "backupTitle": "Your backup codes",
+      "backupBody": "Write these down and keep them somewhere safe. Each one works once if you lose your phone.",
+      "code": "Code from the app",
+      "finish": "Turn on two-step sign-in",
+      "invalidPassword": "That password is incorrect.",
+      "invalidCode": "That code didn't work. Wait for a new code and try again."
+    },
+    "invite": {
+      "titleInvite": "Create your admin account",
+      "titleReset": "Reset your sign-in",
+      "intro": "You've been invited as {role} using {email}.",
+      "resetIntro": "Set a new password for {email}. You'll set up two-step sign-in again afterwards.",
+      "name": "Your name",
+      "password": "Password (at least 12 characters)",
+      "confirm": "Confirm password",
+      "submitInvite": "Create account",
+      "submitReset": "Save new password",
+      "invalidLink": "This link has expired or has already been used. Ask an owner for a new one.",
+      "errors": {
+        "name": "Enter your name.",
+        "password": "Use at least 12 characters.",
+        "confirm": "The passwords don't match.",
+        "invalid_link": "This link has expired or has already been used.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "dashboard": {
+      "welcome": "Welcome, {name}",
+      "role": "You're signed in as {role}.",
+      "next": "Announcements, events, media and the member register arrive in the next milestones."
+    },
+    "users": {
+      "title": "Admin users",
+      "inviteTitle": "Invite an admin",
+      "inviteHelp": "The link works once and expires in 7 days. Send it privately, for example on WhatsApp.",
+      "email": "Email",
+      "name": "Name",
+      "role": "Role",
+      "createInvite": "Create invite link",
+      "linkReady": "Invite link for {email}:",
+      "resetReady": "Reset link for {email} (works once, expires in 2 days):",
+      "copy": "Copy link",
+      "copied": "Copied",
+      "listTitle": "Admins",
+      "status": "Status",
+      "active": "Active",
+      "deactivated": "Deactivated",
+      "twoFactor": "Two-step sign-in",
+      "twoFactorOn": "On",
+      "twoFactorOff": "Not set up",
+      "lastSignIn": "Last sign-in",
+      "never": "Never",
+      "you": "you",
+      "changeRole": "Change role",
+      "save": "Save",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate",
+      "resetLink": "Create reset link",
+      "pendingTitle": "Pending links",
+      "noPending": "No pending links.",
+      "purposeInvite": "Invite",
+      "purposeReset": "Reset",
+      "expires": "expires {date}",
+      "revoke": "Revoke",
+      "errors": {
+        "email_in_use": "An admin with this email already exists.",
+        "last_owner": "There must always be at least one active owner.",
+        "self": "You can't change your own role or deactivate yourself.",
+        "invalid": "Check the details and try again.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "audit": {
+      "title": "Audit log",
+      "intro": "The latest 200 recorded actions.",
+      "when": "When",
+      "who": "Who",
+      "action": "Action",
+      "target": "Target",
+      "system": "Visitor or system",
+      "empty": "Nothing has been logged yet."
+    },
+    "register": {
+      "title": "Member register",
+      "next": "The register arrives in milestone M3."
+    },
+    "forbidden": {
+      "title": "Not allowed",
+      "body": "Your role doesn't include access to this page.",
+      "back": "Back to the dashboard"
+    }
   }
 }

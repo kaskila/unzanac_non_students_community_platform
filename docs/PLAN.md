@@ -27,7 +27,7 @@
 
 ### Success criteria
 
-- The home page loads in under 3 seconds on throttled 3G and transfers under 150 KB.
+- The home page loads in under 3 seconds on throttled 3G and meets its byte budget: critical path ≤ 50 KB, first visit ≤ 200 KB, repeat visit ≤ 20 KB (ADR 0002).
 - Admins can publish an announcement or event from a phone in under a minute.
 - The existing register can be imported and duplicates cleaned up.
 - An update campaign reaches every member through WhatsApp links and is tracked in one screen.
@@ -692,7 +692,7 @@ model AuditLog {
 
 | Area | Target | How it's enforced |
 |---|---|---|
-| Performance | Home ≤150 KB transferred, LCP < 2.5 s on Slow 4G, CLS < 0.1 | Lighthouse CI budgets fail the build |
+| Performance | Home page critical path ≤ 50 KB, first visit ≤ 200 KB, repeat visit ≤ 20 KB (ADR 0002); LCP < 2.5 s on Slow 4G, CLS < 0.1 | Lighthouse CI budgets fail the build |
 | Accessibility | WCAG 2.2 AA | `@axe-core/playwright` on every public page and form, plus a manual TalkBack pass before launch |
 | Layout | Usable at 360 px, tap targets ≥ 44 px | Playwright runs at 360×740 |
 | Types and lint | `strict`, no `any`, ESLint | CI |
@@ -710,7 +710,7 @@ model AuditLog {
 7. Editor pastes a YouTube link → title and thumbnail filled in → publish → the Watch page loads **no YouTube script** until play is tapped.
 8. Editor uploads a PDF → it appears in Resources with type and size → a visitor downloads it → the count increases; an unlisted item is missing from lists but opens by its link; an `.html` upload is rejected.
 
-**Risk to watch:** the Next.js App Router ships roughly 90–100 KB of framework JavaScript on its own. The 150 KB budget leaves little room. M0 measures it on an empty page; if it doesn't fit, we decide then (raise the budget, or serve the home page without hydration).
+**Byte budget:** the Next.js App Router ships about 140 KB (gzip) of framework JavaScript on every first visit, more than the 90–100 KB first estimated. M0 measured it, and [ADR 0002](decisions/0002-home-page-budget.md) replaced the single 150 KB limit with a split budget: critical path ≤ 50 KB, first visit ≤ 200 KB, repeat visit ≤ 20 KB (ADR 0002).
 
 ---
 
@@ -767,7 +767,7 @@ Estimates assume one developer working about 20–25 hours a week. Each mileston
 | Risk | Impact | Mitigation |
 |---|---|---|
 | The official NAC register format differs from our fields | Rework | Single field definition list (`member-fields.ts`); get the format before M3 |
-| The 150 KB budget can't be met with App Router | Slower first load | Measured in M0, decision recorded early |
+| Framework JavaScript grows with Next.js upgrades | Heavier first visit | First-visit and critical-path budgets fail CI; reviewed on each Next.js upgrade (ADR 0002) |
 | An update link is forwarded to someone else | Exposure of one member's data | Year-of-birth check, partly hidden phones, 14-day expiry, revocation, logged opens |
 | Spam on the join form | A cluttered queue | Honeypot, rate limit, Turnstile, "mark as spam" |
 | The register leaks through an export | Serious privacy breach | Owner-only, logged, sensitive columns opt-in, 2FA |

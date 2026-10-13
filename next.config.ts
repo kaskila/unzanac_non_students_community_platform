@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  experimental: {
+    // Enables forbidden() for 403 pages (src/server/session.ts).
+    authInterrupts: true,
+  },
   turbopack: {
     rules: {
       "*.css": {

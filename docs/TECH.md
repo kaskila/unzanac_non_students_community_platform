@@ -17,7 +17,7 @@ This guide explains which technologies the platform uses, why each was chosen, a
 ### Next.js 16 (framework, built on React)
 - **What:** one framework for both the pages and the server code. There are no separate front-end and back-end projects.
 - **Why:**
-  - **Server rendering:** pages arrive as ready HTML, so budget phones show content without downloading and running much JavaScript. This is how we meet the 150 KB home page budget.
+  - **Server rendering:** pages arrive as ready HTML, so budget phones show content without downloading and running much JavaScript. This keeps the critical path (HTML + CSS + images) under 50 KB (ADR 0002).
   - **Caching:** public pages are built once and served from a CDN (a network of servers near the visitor) until content changes.
 - **How:**
   - **File-based routing:** `src/app/(public)/events/page.tsx` serves `/events`.
@@ -160,7 +160,7 @@ This guide explains which technologies the platform uses, why each was chosen, a
 | **Vitest** | Unit tests: permissions, recurrence, change diffs, duplicate detection, token checks, brand contrast pairs |
 | **Playwright** | Real browser at 360 × 740 runs the critical journeys (see PLAN.md §9) |
 | **@axe-core/playwright** | WCAG 2.2 AA accessibility rules on every public page and form |
-| **Lighthouse CI** | Performance and byte budgets; the build fails if the home page goes over 150 KB |
+| **Lighthouse CI** | Performance and byte budgets; the build fails if the home page breaks its budget (critical path ≤ 50 KB, first visit ≤ 200 KB, repeat visit ≤ 20 KB (ADR 0002)) |
 | `npm audit`, Dependabot, secret scanning | Vulnerable dependencies and leaked secrets |
 
 ---

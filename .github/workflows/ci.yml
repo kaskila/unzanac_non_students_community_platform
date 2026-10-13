@@ -16,6 +16,11 @@ env:
   DATABASE_URL: postgresql://unzanac:unzanac_dev@localhost:5432/unzanac?schema=public
   NEXT_PUBLIC_SITE_URL: http://localhost:3100
   NEXT_TELEMETRY_DISABLED: "1"
+  # CI-only values; real secrets live in the hosting provider, never in the repo.
+  BETTER_AUTH_SECRET: ci-only-secret-not-used-anywhere-else-0123456789
+  BETTER_AUTH_URL: http://localhost:3100
+  # E2E tests reset this database on every run (tests/e2e/global-setup.ts).
+  E2E_DATABASE_URL: postgresql://unzanac:unzanac_dev@localhost:5432/unzanac_test?schema=public
 
 jobs:
   quality:
@@ -57,7 +62,7 @@ jobs:
         run: npm run db:deploy && npm run db:seed
       - run: npm run build
       - run: npx playwright install --with-deps chromium
-      - name: Playwright (phone size, axe, byte budget)
+      - name: Playwright (phone size, axe, byte budgets, admin flows)
         run: npm run test:e2e
       - name: Lighthouse CI
         run: |

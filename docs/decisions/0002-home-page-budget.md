@@ -1,6 +1,6 @@
 # ADR 0002: Home page byte budget
 
-- **Status:** proposed, waiting for a decision
+- **Status:** accepted (13 Oct 2026, option 1)
 - **Date:** 2026-10-13
 
 ## Context
@@ -35,4 +35,18 @@ Facts that matter for the decision:
 
 ## Decision
 
-Pending. Until it's made, CI enforces the original 150 KB total, which will start failing once real content is added in M2.
+**Option 1: split budget**, enforced in CI by `tests/e2e/home.spec.ts` (actual network bytes measured through Chrome DevTools) and `lighthouserc.json`:
+
+| Budget | Limit | What it covers |
+|---|---|---|
+| Critical path | **≤ 50 KB** | HTML + CSS + images + fonts on first visit |
+| First visit | **≤ 200 KB** | Everything, including framework JavaScript |
+| Repeat visit | **≤ 20 KB** | Second visit with a warm browser cache |
+
+When M1 added 403 pages (`authInterrupts`), the framework JavaScript grew to ~143 KB and the page reached 152.6 KB. That confirmed the single 150 KB limit couldn't hold once real features arrived.
+
+## Consequences
+
+- Our own bytes stay tightly limited (critical path), which is what decides speed on 3G.
+- The framework's one-time cost is accepted and capped. Next.js upgrades that grow it are caught by the first-visit budget.
+- Images, embeds and client components on public pages must fit inside the critical-path and first-visit limits.
