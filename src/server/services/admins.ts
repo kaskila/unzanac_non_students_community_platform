@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { auth } from "@/server/auth";
 import { audit } from "@/server/audit";
+import { ServiceError } from "@/server/errors";
 import { prisma } from "@/server/db";
 import { ADMIN_ROLES, can, type Actor, type AdminRole } from "@/server/policy";
 import { appUrl, generateToken, hashToken } from "@/server/tokens";
@@ -8,11 +9,7 @@ import { appUrl, generateToken, hashToken } from "@/server/tokens";
 const INVITE_DAYS = 7;
 const RESET_DAYS = 2;
 
-export class ServiceError extends Error {
-  constructor(public readonly code: string) {
-    super(code);
-  }
-}
+export { ServiceError };
 
 function assertCanManage(actor: Actor) {
   if (!can(actor, "admin.manage")) throw new ServiceError("forbidden");

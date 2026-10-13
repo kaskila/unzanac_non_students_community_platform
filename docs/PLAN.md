@@ -397,6 +397,7 @@ model Event {
   startsAt       DateTime
   endsAt         DateTime
   rrule          String?                  // RFC 5545, null = one-off
+  isService      Boolean  @default(false) // divine service: feeds the "next service card"
   showInSchedule Boolean  @default(false)
   committeeId        String?
   status         ContentStatus @default(DRAFT)

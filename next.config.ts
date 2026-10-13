@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  cacheLife: {
+    // Public pages (docs/PLAN.md §6): refreshed every 5 minutes, and at once when an admin
+    // changes content (updateTag). Five minutes also bounds how late a scheduled post appears.
+    public: { stale: 300, revalidate: 300, expire: 86_400 },
+  },
   experimental: {
     // Enables forbidden() for 403 pages (src/server/session.ts).
     authInterrupts: true,

@@ -10,6 +10,10 @@ export async function AdminNav() {
 
   const links = [
     { href: "/admin", label: t("nav.dashboard"), show: true },
+    { href: "/admin/announcements", label: t("nav.announcements"), show: can(actor, "content.manage") },
+    { href: "/admin/events", label: t("nav.events"), show: can(actor, "content.manage") },
+    { href: "/admin/committees", label: t("nav.committees"), show: can(actor, "content.manage") },
+    { href: "/admin/content", label: t("nav.content"), show: can(actor, "site.edit") },
     { href: "/admin/register", label: t("nav.register"), show: can(actor, "register.view") },
     { href: "/admin/users", label: t("nav.users"), show: can(actor, "admin.manage") },
     { href: "/admin/audit", label: t("nav.audit"), show: can(actor, "audit.view") },

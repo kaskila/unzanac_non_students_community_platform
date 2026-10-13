@@ -23,6 +23,96 @@ model Committee {
   isPublic     Boolean  @default(true)
   createdAt    DateTime @default(now()) @db.Timestamptz(3)
   updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  announcements Announcement[]
+  events        Event[]
+}
+
+// ── Content (M2) ──
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AnnouncementCategory {
+  GENERAL
+  SERVICES
+  YOUTH
+  SUNDAY_SCHOOL
+  MUSIC
+  CONDOLENCES
+}
+
+model Announcement {
+  id          String               @id @default(cuid())
+  slug        String               @unique
+  title       String
+  body        String // limited Markdown (src/lib/markdown.ts)
+  category    AnnouncementCategory @default(GENERAL)
+  committeeId String?
+  committee   Committee?           @relation(fields: [committeeId], references: [id], onDelete: SetNull)
+  pinned      Boolean              @default(false)
+  status      ContentStatus        @default(DRAFT)
+  publishAt   DateTime?            @db.Timestamptz(3) // set on publish; a future value means scheduled
+  expiresAt   DateTime?            @db.Timestamptz(3)
+  authorId    String
+  createdAt   DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime             @updatedAt @db.Timestamptz(3)
+
+  @@index([status, publishAt])
+}
+
+model Event {
+  id             String           @id @default(cuid())
+  slug           String           @unique
+  title          String
+  details        String? // limited Markdown
+  venue          String
+  mapUrl         String?
+  audience       String? // "Everyone", "Youth", ...
+  startsAt       DateTime         @db.Timestamptz(3) // first occurrence
+  endsAt         DateTime         @db.Timestamptz(3)
+  rrule          String? // RFC 5545 subset (src/lib/recurrence.ts); null = one-off
+  isService      Boolean          @default(false) // a divine service: feeds the "Next service" card
+  showInSchedule Boolean          @default(false)
+  committeeId    String?
+  committee      Committee?       @relation(fields: [committeeId], references: [id], onDelete: SetNull)
+  status         ContentStatus    @default(DRAFT)
+  createdById    String
+  createdAt      DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime         @updatedAt @db.Timestamptz(3)
+  exceptions     EventException[]
+
+  @@index([status, startsAt])
+}
+
+model EventException {
+  id              String    @id @default(cuid())
+  eventId         String
+  event           Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  occurrenceStart DateTime  @db.Timestamptz(3) // the original start of the date being changed
+  cancelled       Boolean   @default(false)
+  newStart        DateTime? @db.Timestamptz(3)
+  newEnd          DateTime? @db.Timestamptz(3)
+  note            String?
+
+  @@unique([eventId, occurrenceStart])
+}
+
+model SiteContent {
+  key         String   @id // hero, visit, contacts, social, verse, location
+  value       Json
+  updatedById String?
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model PrivacyNotice {
+  version       Int      @id
+  body          String // limited Markdown
+  publishedAt   DateTime @default(now()) @db.Timestamptz(3)
+  publishedById String?
 }
 
 // ── Admin access (M1) ──

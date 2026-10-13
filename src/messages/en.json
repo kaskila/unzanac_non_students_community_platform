@@ -4,22 +4,45 @@
     "tagline": "New Apostolic Church · UNZA Congregation",
     "description": "News, services, committees and resources for the UNZA congregation of the New Apostolic Church.",
     "skipToContent": "Skip to main content",
-    "emblemAlt": "New Apostolic Church emblem"
+    "emblemAlt": "New Apostolic Church emblem",
+    "nav": {
+      "label": "Main menu",
+      "announcements": "Announcements",
+      "events": "Events",
+      "committees": "Committees",
+      "visit": "Plan a visit"
+    }
   },
   "Home": {
-    "heroTitle": "Welcome to UNZANAC",
-    "heroBody": "Whether you live, work or study near UNZA, or are visiting for the first time, you belong here.",
     "nextServiceTitle": "Next service",
     "nextServicePending": "Service times will be published here soon.",
+    "addToCalendar": "Add to calendar",
+    "directions": "Directions",
+    "pinned": "Pinned",
+    "announcementsTitle": "Announcements",
+    "noAnnouncements": "No announcements at the moment.",
+    "allAnnouncements": "All announcements",
+    "thisWeekTitle": "This week",
+    "noEventsThisWeek": "Nothing else is planned this week.",
+    "allEvents": "All events",
+    "scheduleTitle": "Regular schedule",
     "committeesTitle": "Committees",
     "committeesIntro": "Our congregation serves through these committees. Ask any minister how to join one.",
     "watchTitle": "Watch and listen",
     "watchBody": "Choir, music and services from the UNZANAC Music Department.",
-    "watchLink": "Watch on YouTube"
+    "watchLink": "Watch on YouTube",
+    "newHereTitle": "New here?",
+    "newHereBody": "Find out what to expect at a divine service, when to come and how to find us.",
+    "newHereLink": "Plan your visit",
+    "contactsTitle": "Contacts",
+    "verseTitle": "Verse of the week"
   },
   "Footer": {
     "follow": "Follow us",
-    "youtube": "YouTube"
+    "youtube": "YouTube",
+    "facebook": "Facebook",
+    "whatsappChannel": "WhatsApp channel",
+    "privacy": "Privacy notice"
   },
   "Admin": {
     "title": "UNZANAC Admin",
@@ -36,7 +59,11 @@
       "users": "Admin users",
       "audit": "Audit log",
       "viewSite": "View site",
-      "signOut": "Sign out"
+      "signOut": "Sign out",
+      "announcements": "Announcements",
+      "events": "Events",
+      "committees": "Committees",
+      "content": "Site content"
     },
     "login": {
       "title": "Admin sign in",
@@ -100,7 +127,12 @@
     "dashboard": {
       "welcome": "Welcome, {name}",
       "role": "You're signed in as {role}.",
-      "next": "Announcements, events, media and the member register arrive in the next milestones."
+      "quiet": "Nothing has been posted for {days} days. A short announcement keeps the site useful.",
+      "newAnnouncement": "New announcement",
+      "newEvent": "New event",
+      "live": "Live announcements",
+      "drafts": "Drafts",
+      "expiring": "Expiring in the next 3 days"
     },
     "users": {
       "title": "Admin users",
@@ -161,6 +193,297 @@
       "title": "Not allowed",
       "body": "Your role doesn't include access to this page.",
       "back": "Back to the dashboard"
+    },
+    "form": {
+      "saved": "Saved.",
+      "errors": {
+        "check_fields": "Some details need checking:",
+        "required": "This is required.",
+        "too_long": "This is too long.",
+        "invalid": "This isn't valid.",
+        "invalid_date": "Enter a valid date and time.",
+        "end_before_start": "The end must be after the start.",
+        "too_long_event": "An event can't last longer than 7 days. Use a repeating event instead.",
+        "until_without_repeat": "Choose how the event repeats, or leave this empty.",
+        "until_before_start": "The last date must be after the first date.",
+        "fifth_weekday": "This date is the 5th of its weekday in the month, which not every month has. Choose another repeat.",
+        "not_last_weekday": "This date isn't the last of its weekday in the month. Choose another repeat.",
+        "expiry_before_publish": "The expiry must be after the publish date.",
+        "phone": "Enter a phone number like 0971 234 567 or +260 97 123 4567.",
+        "https": "Enter a full link starting with https://",
+        "slug": "Use lowercase letters, numbers and hyphens only.",
+        "slug_taken": "Another committee already uses this web address.",
+        "unchanged": "This version is the same as the published one.",
+        "not_found": "This item no longer exists.",
+        "not_an_occurrence": "That date is no longer part of this event. Reload the page.",
+        "forbidden": "Your role doesn't allow this.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "announcements": {
+      "title": "Announcements",
+      "new": "New announcement",
+      "newTitle": "New announcement",
+      "back": "← All announcements",
+      "empty": "No announcements yet.",
+      "pinned": "Pinned",
+      "viewPublic": "View on the site",
+      "shareTitle": "Share on WhatsApp",
+      "shareHelp": "Copy this text and paste it into the congregation's WhatsApp groups.",
+      "copyText": "Copy text",
+      "copied": "Copied",
+      "states": {
+        "draft": "Draft",
+        "scheduled": "Scheduled",
+        "live": "Live",
+        "expired": "Expired",
+        "archived": "Archived"
+      },
+      "fields": {
+        "title": "Title",
+        "body": "Text",
+        "bodyHint": "Use **bold**, *italic*, [link text](https://…) and lines starting with \"- \" for lists.",
+        "category": "Category",
+        "committee": "Committee",
+        "noCommittee": "None",
+        "pinned": "Pin to the top",
+        "pinnedHint": "Pinned announcements always show first on the home page.",
+        "publishAt": "Publish at",
+        "publishAtHint": "Leave empty to publish now. A future time schedules it.",
+        "expiresAt": "Remove from the site at",
+        "expiresAtHint": "Optional, e.g. the day after the event it's about."
+      },
+      "actions": {
+        "publish": "Publish",
+        "saveDraft": "Save draft",
+        "saveChanges": "Save changes",
+        "unpublish": "Unpublish",
+        "archive": "Archive",
+        "restore": "Restore as draft"
+      }
+    },
+    "events": {
+      "title": "Events",
+      "new": "New event",
+      "newTitle": "New event",
+      "back": "← All events",
+      "empty": "No events yet. Start with the regular divine service.",
+      "service": "Divine service",
+      "viewPublic": "View on the site",
+      "status": {
+        "DRAFT": "Draft",
+        "PUBLISHED": "Published",
+        "ARCHIVED": "Archived"
+      },
+      "recurrence": {
+        "none": "Doesn't repeat",
+        "weekly": "Every week",
+        "fortnightly": "Every two weeks",
+        "monthly_date": "Every month on the same date",
+        "monthly_weekday": "Every month on the same weekday (e.g. 3rd Sunday)",
+        "monthly_last_weekday": "Every month on the last weekday (e.g. last Sunday)"
+      },
+      "fields": {
+        "title": "Title",
+        "startsAt": "Starts (first date)",
+        "endsAt": "Ends",
+        "recurrence": "Repeats",
+        "recurrenceHint": "Based on the first date.",
+        "until": "Last date",
+        "untilHint": "Optional. Leave empty to repeat until changed.",
+        "venue": "Venue",
+        "mapUrl": "Map link",
+        "mapUrlHint": "Optional. Paste a Google Maps link starting with https://",
+        "audience": "For",
+        "audienceHint": "Optional, e.g. Everyone, Youth, Sunday school.",
+        "committee": "Committee",
+        "noCommittee": "None",
+        "details": "Details",
+        "detailsHint": "Optional. Same formatting as announcements.",
+        "isService": "This is a divine service",
+        "isServiceHint": "The next divine service is shown at the top of the home page.",
+        "showInSchedule": "Show in the regular schedule",
+        "showInScheduleHint": "For repeating events such as Sunday service or choir practice."
+      },
+      "actions": {
+        "publish": "Publish",
+        "saveDraft": "Save draft",
+        "saveChanges": "Save changes",
+        "unpublish": "Unpublish",
+        "archive": "Archive",
+        "restore": "Restore as draft"
+      },
+      "dates": {
+        "title": "Upcoming dates",
+        "intro": "Cancel or move a single date without changing the rest of the series.",
+        "none": "No dates in the next six months.",
+        "cancelled": "Cancelled",
+        "movedTo": "Moved to {date}",
+        "change": "Cancel or move",
+        "note": "Note for visitors",
+        "noteHint": "Optional, e.g. \"Joint service at Lusaka Central\".",
+        "cancel": "Cancel this date",
+        "newStart": "New start",
+        "newEnd": "New end",
+        "newEndHint": "Optional. Keeps the usual length if empty.",
+        "move": "Move this date",
+        "restore": "Restore"
+      }
+    },
+    "committees": {
+      "title": "Committees",
+      "intro": "Committees appear on the public site, in the join form and in register filters.",
+      "new": "New committee",
+      "newTitle": "New committee",
+      "back": "← All committees",
+      "hidden": "Hidden",
+      "noMeetingInfo": "No meeting times yet",
+      "viewPublic": "View on the site",
+      "save": "Save changes",
+      "create": "Create committee",
+      "fields": {
+        "name": "Name",
+        "slug": "Web address",
+        "slugHint": "Optional. Made from the name if empty, e.g. first-aid. It can't be changed later.",
+        "description": "About",
+        "descriptionHint": "What the committee does. Same formatting as announcements.",
+        "meetingInfo": "Meeting times",
+        "meetingInfoHint": "e.g. Saturdays after choir practice, 16:00",
+        "contactName": "Contact person",
+        "contactPhone": "Contact phone",
+        "phoneHint": "Shown publicly with a WhatsApp link.",
+        "sortOrder": "Order",
+        "sortOrderHint": "Lower numbers show first.",
+        "isPublic": "Show on the public site",
+        "isPublicHint": "Hidden committees stay available inside the admin area."
+      }
+    },
+    "content": {
+      "title": "Site content",
+      "intro": "Text and links shown on the public site. Changes appear straight away.",
+      "save": "Save",
+      "markdownHint": "Use **bold**, *italic*, [link text](https://…) and lines starting with \"- \" for lists.",
+      "hero": {
+        "title": "Home page welcome",
+        "intro": "The large greeting at the top of the home page.",
+        "heading": "Heading",
+        "headingHint": "Keep it short: it's shown in large text.",
+        "body": "Welcome text"
+      },
+      "location": {
+        "title": "Church location",
+        "intro": "Used on the visit page and as the default venue for new events.",
+        "name": "Name",
+        "address": "Address or directions",
+        "addressHint": "e.g. Great East Road, opposite the UNZA main gate",
+        "mapUrl": "Map link",
+        "mapUrlHint": "A Google Maps link starting with https://"
+      },
+      "visit": {
+        "title": "\"Plan your visit\" page",
+        "intro": "What a first-time visitor should know.",
+        "body": "Text"
+      },
+      "contacts": {
+        "title": "Contacts",
+        "intro": "Shown on the home and visit pages. Leave a row empty to remove it.",
+        "row": "Contact {n}",
+        "role": "Role",
+        "name": "Name",
+        "phone": "Phone",
+        "whatsapp": "Reachable on WhatsApp"
+      },
+      "social": {
+        "title": "Social links",
+        "intro": "Shown in the footer of every page.",
+        "youtube": "YouTube channel",
+        "facebook": "Facebook page",
+        "facebookHint": "Use the page's permanent address, not a share link (share links can expire).",
+        "whatsappChannel": "WhatsApp channel"
+      },
+      "verse": {
+        "title": "Verse of the week",
+        "intro": "Optional. Leave the text empty to hide it.",
+        "text": "Verse",
+        "textHint": "e.g. \"Rejoice in the Lord always.\"",
+        "reference": "Reference"
+      },
+      "privacy": {
+        "title": "Privacy notice",
+        "intro": "Publishing creates a new version. From the join form (M4), each submission records which version the person accepted.",
+        "current": "Current: version {version}, published {date}.",
+        "none": "No privacy notice has been published yet.",
+        "body": "Notice",
+        "publish": "Publish new version",
+        "published": "Published."
+      }
     }
+  },
+  "Content": {
+    "loading": "Loading…",
+    "pinned": "Pinned",
+    "shareWhatsApp": "Share on WhatsApp",
+    "chatWhatsApp": "WhatsApp",
+    "cancelled": "Cancelled",
+    "moved": "New time",
+    "categories": {
+      "GENERAL": "General",
+      "SERVICES": "Divine services",
+      "YOUTH": "Youth",
+      "SUNDAY_SCHOOL": "Sunday school",
+      "MUSIC": "Choir & music",
+      "CONDOLENCES": "Condolences"
+    },
+    "schedule": {
+      "weekly": "Every {weekday}",
+      "fortnightly": "Every other {weekday}",
+      "monthlyDate": "Every month on the {day, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}",
+      "monthlyNth": "{nth, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} {weekday} of every month",
+      "monthlyLast": "Last {weekday} of every month"
+    }
+  },
+  "Announcements": {
+    "title": "Announcements",
+    "intro": "News and notices from the congregation.",
+    "empty": "No announcements at the moment.",
+    "back": "All announcements"
+  },
+  "Events": {
+    "title": "Events",
+    "intro": "Services and events for the next two months.",
+    "empty": "No events are planned yet.",
+    "back": "All events",
+    "scheduleTitle": "Regular schedule",
+    "when": "When",
+    "nextDates": "Next dates",
+    "noUpcoming": "No upcoming dates.",
+    "venue": "Venue",
+    "directions": "Directions",
+    "audience": "For",
+    "committee": "Committee",
+    "addToCalendar": "Add to calendar"
+  },
+  "Committees": {
+    "title": "Committees",
+    "intro": "The congregation serves through these committees. Everyone is welcome to take part.",
+    "back": "All committees",
+    "noDescription": "More about this committee will be added soon.",
+    "meets": "Meetings",
+    "contact": "Contact",
+    "contactRole": "Committee contact",
+    "joinHint": "To join, speak to the contact person or any minister after a divine service.",
+    "upcoming": "Upcoming events"
+  },
+  "Visit": {
+    "title": "Plan your visit",
+    "whereTitle": "Where to find us",
+    "directions": "Directions",
+    "timesTitle": "Service times",
+    "questionsTitle": "Questions?"
+  },
+  "Privacy": {
+    "title": "Privacy notice",
+    "version": "Version {version}, published {date}",
+    "none": "The privacy notice will be published here before the membership form opens."
   }
 }
