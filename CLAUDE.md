@@ -17,3 +17,4 @@ Website and admin platform for the UNZA congregation of the New Apostolic Church
 - Say "committee", never "group".
 - Before finishing: `npm run check`, `npm run build`, `npm run test:e2e`. E2E resets `unzanac_test`; Prisma asks the user for consent when an AI agent runs it.
 - Update `docs/STATUS.md` when a piece of work is finished or a decision is made.
+- Commit and push as **Kasikila** (`git config user.name "Kasikila"` in this repo; check before committing).

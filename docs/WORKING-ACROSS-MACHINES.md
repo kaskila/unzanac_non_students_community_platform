@@ -21,7 +21,7 @@ Because conversations don't travel, **write decisions into the repo**. `docs/STA
    - VS Code and Claude Code, if you use them.
 2. **Git identity** (use the same on every machine):
    ```powershell
-   git config --global user.name "Isaac Kasikila"
+   git config --global user.name "Kasikila"
    git config --global user.email "your-email@example.com"
    ```
 3. **Get the code**:
