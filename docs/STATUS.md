@@ -1,7 +1,7 @@
 # Project status
 
 **Updated:** 13 Oct 2026
-**Current branch:** `m2-content` (built on `m1-admin-access`)
+**Current branch:** `m2b-media` (built on `m2-content`)
 
 ## Done
 
@@ -10,6 +10,7 @@
 | M0 Foundation | `m0-foundation` | Pushed. **Not merged to `main` yet**: open a pull request to run CI for the first time |
 | M1 Admin access | `m1-admin-access` | Pushed. All checks pass locally (lint, types, 66 unit, 9 E2E). Ready for review and pull request after M0 |
 | M2 Content + public site | `m2-content` | Pushed. All checks pass locally (lint, types, 102 unit, 13 E2E incl. journeys 1 and 2). Ready for pull request after M1 |
+| M2b Media + resources | `m2b-media` | Pushed. All checks pass locally (lint, types, 111 unit, 18 E2E incl. journeys 7 and 8). R2 not yet tried for real (no account yet) |
 
 ### M1 summary
 - Better Auth: invite-only email + password, **required TOTP two-step sign-in**, backup codes, 8-hour idle sessions, rate limits (5 sign-ins/min, lockout after 10 wrong codes).
@@ -23,6 +24,12 @@
 - Public: home page with next service card, announcements (pinned first + latest 3), this week, regular schedule, committees, contacts, verse; `/announcements`, `/events` (list grouped by day), `/events/[slug]` + `/ics`, `/committees`, `/visit`, `/privacy`.
 - Public pages are prerendered and cached for 5 minutes (`cacheLife("public")`); admin saves call `updateTag()` so changes appear at once. Reads live in `src/server/public.ts`, writes in `src/server/services/*`.
 - Internal public links use `NavLink` (`next/link` with prefetch off) so visitors don't download pages they never open.
+
+### M2b summary
+- **Media:** paste a YouTube (video, Short, live, playlist) or Facebook link → draft with title from YouTube oEmbed → categorise, feature (one at a time), publish. Channel uploads are imported as drafts nightly (`/api/cron/daily`, `vercel.json`) or with "Check for new uploads"; needs the channel ID in Site content → Social links.
+- **Public:** `/watch` (by category; "titles only" mode), `/watch/[slug]` with tap-to-play `youtube-nocookie.com` player and "Watch in the YouTube app"; Facebook videos are link cards. Home shows the featured video and a "Live now" banner while an event with a livestream link is running.
+- **Resources:** create → upload straight to storage with a progress bar → server checks size and real type (first bytes, `file-type`) → publish. Replace keeps the link, versions are listed, downloads are counted. Public `/resources` (by category, search), `/resources/[slug]` ("PDF · 1.2 MB"), `/resources/[slug]/download` (count + 5-minute signed link). Unlisted items are link-only. Owners can delete; files are purged 30 days later by the daily job.
+- **Storage drivers** (`src/server/storage`): `r2` for staging/production, `local` (`.storage/` + `/api/dev-storage`) for development and E2E, refused in production unless `ALLOW_LOCAL_STORAGE=1`.
 
 ## Decisions made
 
@@ -40,8 +47,9 @@
 ## Next steps
 
 1. Fill in real content from the Phase 0 content pack in Admin → Site content and Events (service times, location, contacts).
-2. Pull requests: `m1-admin-access` → `main` (includes M0), then `m2-content` → `main`.
-3. Then **M2b: media + resources** on `m2b-media` (PLAN.md §11).
+2. **R2 setup for staging:** create a private bucket per environment, an API token, and a CORS rule allowing `PUT` from the site's origin; set `R2_*` and `CRON_SECRET` in Vercel (`.env.example`). Then try journey 8 on staging.
+3. Pull requests: `m1-admin-access` → `main` (includes M0), then `m2-content` → `main`.
+4. Then **M3: register core** on `m3-register` (PLAN.md §11). Needs the existing register file.
 
 ## Open items (need someone, not code)
 

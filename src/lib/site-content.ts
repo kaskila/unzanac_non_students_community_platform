@@ -4,6 +4,7 @@
 
 import { z } from "zod";
 import { normalizePhone } from "@/lib/phone";
+import { CHANNEL_ID_PATTERN } from "@/lib/video-links";
 
 const text = (max: number) => z.string().trim().max(max);
 const optionalUrl = z
@@ -31,7 +32,17 @@ export const SITE_CONTENT_SCHEMAS = {
   location: z.object({ name: text(100).min(1), address: text(200), mapUrl: optionalUrl }),
   visit: z.object({ body: text(4000).min(1) }),
   contacts: z.object({ items: z.array(contact).max(8) }),
-  social: z.object({ youtube: optionalUrl, facebook: optionalUrl, whatsappChannel: optionalUrl }),
+  social: z.object({
+    youtube: optionalUrl,
+    // Channel ID ("UC…") for importing new uploads; defaults keep rows saved before M2b valid.
+    youtubeChannelId: z
+      .string()
+      .trim()
+      .default("")
+      .refine((v) => v === "" || CHANNEL_ID_PATTERN.test(v), "channel_id"),
+    facebook: optionalUrl,
+    whatsappChannel: optionalUrl,
+  }),
   verse: z.object({ text: text(400), reference: text(60) }),
 } as const;
 
@@ -66,7 +77,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     ].join("\n"),
   },
   contacts: { items: [] },
-  social: { youtube: "https://www.youtube.com/@UNZANACMUSICDEPT", facebook: "", whatsappChannel: "" },
+  social: { youtube: "https://www.youtube.com/@UNZANACMUSICDEPT", youtubeChannelId: "", facebook: "", whatsappChannel: "" },
   verse: { text: "", reference: "" },
 };
 

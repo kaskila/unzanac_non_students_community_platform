@@ -34,6 +34,7 @@ export const eventSchema = z
     details: fields.optional(5000),
     venue: fields.required(150),
     mapUrl: fields.optionalHttpsUrl,
+    livestreamUrl: fields.optionalHttpsUrl,
     audience: fields.optional(60),
     startsAt: fields.dateTime,
     endsAt: fields.dateTime,

@@ -10,7 +10,9 @@
       "announcements": "Announcements",
       "events": "Events",
       "committees": "Committees",
-      "visit": "Plan a visit"
+      "visit": "Plan a visit",
+      "watch": "Watch",
+      "resources": "Resources"
     }
   },
   "Home": {
@@ -35,7 +37,12 @@
     "newHereBody": "Find out what to expect at a divine service, when to come and how to find us.",
     "newHereLink": "Plan your visit",
     "contactsTitle": "Contacts",
-    "verseTitle": "Verse of the week"
+    "verseTitle": "Verse of the week",
+    "liveNow": "Live now: {title}.",
+    "watchLive": "Watch the livestream",
+    "moreVideos": "More videos",
+    "resourcesTitle": "Resources",
+    "allResources": "All resources"
   },
   "Footer": {
     "follow": "Follow us",
@@ -63,7 +70,9 @@
       "announcements": "Announcements",
       "events": "Events",
       "committees": "Committees",
-      "content": "Site content"
+      "content": "Site content",
+      "media": "Media",
+      "resources": "Resources"
     },
     "login": {
       "title": "Admin sign in",
@@ -217,7 +226,20 @@
         "not_found": "This item no longer exists.",
         "not_an_occurrence": "That date is no longer part of this event. Reload the page.",
         "forbidden": "Your role doesn't allow this.",
-        "generic": "Something went wrong. Please try again."
+        "generic": "Something went wrong. Please try again.",
+        "video_url": "Paste a YouTube or Facebook video link.",
+        "video_exists": "This video has already been added.",
+        "channel_id": "A channel ID starts with UC and has 24 characters.",
+        "no_channel_id": "Add the YouTube channel ID under Site content first.",
+        "feed_unavailable": "YouTube didn't answer. Try again later.",
+        "no_file": "Upload a file before publishing.",
+        "no_file_chosen": "Choose a file first.",
+        "file_type": "This type of file isn't allowed. Use PDF, Word, PowerPoint, Excel, JPG, PNG, WebP, MP3 or M4A.",
+        "file_size": "This file is too large (PDF and Office up to 25 MB, pictures 10 MB, audio 50 MB).",
+        "file_empty": "This file is empty.",
+        "upload_expired": "The upload took too long. Please try again.",
+        "upload_missing": "The file didn't arrive. Please try again.",
+        "upload_failed": "The upload failed. Check your connection and try again."
       }
     },
     "announcements": {
@@ -303,7 +325,9 @@
         "isService": "This is a divine service",
         "isServiceHint": "The next divine service is shown at the top of the home page.",
         "showInSchedule": "Show in the regular schedule",
-        "showInScheduleHint": "For repeating events such as Sunday service or choir practice."
+        "showInScheduleHint": "For repeating events such as Sunday service or choir practice.",
+        "livestreamUrl": "Livestream link",
+        "livestreamUrlHint": "Optional. While the event is running, the home page shows a \"Live now\" banner with this link."
       },
       "actions": {
         "publish": "Publish",
@@ -399,7 +423,9 @@
         "youtube": "YouTube channel",
         "facebook": "Facebook page",
         "facebookHint": "Use the page's permanent address, not a share link (share links can expire).",
-        "whatsappChannel": "WhatsApp channel"
+        "whatsappChannel": "WhatsApp channel",
+        "youtubeChannelId": "YouTube channel ID",
+        "youtubeChannelIdHint": "Starts with UC (YouTube Studio → Settings → Channel → Advanced settings). Used to import new uploads as drafts."
       },
       "verse": {
         "title": "Verse of the week",
@@ -416,6 +442,117 @@
         "body": "Notice",
         "publish": "Publish new version",
         "published": "Published."
+      }
+    },
+    "media": {
+      "title": "Media",
+      "addTitle": "Add a video",
+      "url": "Video link",
+      "urlHint": "A YouTube link (video, Short, live or playlist) or a Facebook video link.",
+      "add": "Add video",
+      "importTitle": "New uploads from the YouTube channel",
+      "importHelp": "New uploads are also checked every night. They arrive as drafts for you to categorise and publish.",
+      "import": "Check for new uploads",
+      "imported": "Checked. New uploads appear below as drafts.",
+      "noChannel": "Set the channel ID to import uploads automatically.",
+      "setChannel": "Go to Site content",
+      "listTitle": "Videos",
+      "empty": "No videos yet.",
+      "featured": "Featured",
+      "fromChannel": "From the channel",
+      "back": "← All videos",
+      "openYouTube": "Open on YouTube",
+      "openFacebook": "Open on Facebook",
+      "viewPublic": "View on the site",
+      "status": {
+        "DRAFT": "Draft",
+        "PUBLISHED": "Published",
+        "ARCHIVED": "Archived"
+      },
+      "actions": {
+        "publish": "Publish",
+        "saveDraft": "Save draft",
+        "saveChanges": "Save changes",
+        "unpublish": "Unpublish",
+        "archive": "Archive",
+        "restore": "Restore as draft"
+      },
+      "fields": {
+        "title": "Title",
+        "description": "Description",
+        "category": "Category",
+        "recordedAt": "Recorded on",
+        "event": "Event",
+        "committee": "Committee",
+        "none": "None",
+        "featured": "Feature on the home page",
+        "featuredHint": "Only one video is featured at a time; featuring this one replaces the current one."
+      }
+    },
+    "resources": {
+      "title": "Resources",
+      "intro": "Files for members to download: programmes, notices, lesson sheets, practice audio.",
+      "new": "New resource",
+      "newTitle": "New resource",
+      "copyright": "Link to official NAC material (hymnal, catechism, community magazine, broadcasts) instead of uploading it, unless permission has been given.",
+      "back": "← All resources",
+      "empty": "No resources yet.",
+      "noFile": "No file yet",
+      "downloads": "{count, plural, one {# download} other {# downloads}}",
+      "deleted": "Deleted",
+      "viewPublic": "View on the site",
+      "status": {
+        "DRAFT": "Draft",
+        "PUBLISHED": "Published",
+        "ARCHIVED": "Archived"
+      },
+      "visibility": {
+        "PUBLIC": "Public (listed)",
+        "UNLISTED": "Unlisted (link only)"
+      },
+      "fileTitle": "File",
+      "noFileYet": "No file uploaded yet.",
+      "versions": "Earlier versions ({count})",
+      "current": "current",
+      "shareTitle": "Share on WhatsApp",
+      "copyText": "Copy text",
+      "copied": "Copied",
+      "detailsTitle": "Details",
+      "deleteTitle": "Delete",
+      "deleteHelp": "The resource disappears at once. Its files are removed after {days} days, so it can be restored until then.",
+      "delete": "Delete resource",
+      "deletedNotice": "This resource was deleted. Its files will be removed on {date}.",
+      "restore": "Restore",
+      "actions": {
+        "publish": "Publish",
+        "saveDraft": "Save draft",
+        "saveChanges": "Save changes",
+        "unpublish": "Unpublish",
+        "archive": "Archive",
+        "restore": "Restore as draft",
+        "createThenUpload": "Save and continue to upload"
+      },
+      "fields": {
+        "title": "Title",
+        "description": "Description",
+        "category": "Category",
+        "committee": "Committee",
+        "none": "None",
+        "visibility": "Visibility",
+        "visibilityHint": "Unlisted resources don't appear in lists or search; anyone with the link can download them.",
+        "expiresAt": "Remove from the site at",
+        "expiresAtHint": "Optional."
+      },
+      "upload": {
+        "label": "Choose a file",
+        "replaceLabel": "Replace the file",
+        "hint": "PDF, Word, PowerPoint or Excel up to 25 MB; JPG, PNG or WebP up to 10 MB; MP3 or M4A up to 50 MB. The link stays the same when you replace a file.",
+        "submit": "Upload",
+        "replace": "Upload new version",
+        "uploading": "Uploading… {percent}%",
+        "progress": "Upload progress",
+        "checking": "Checking the file…",
+        "done": "Uploaded."
       }
     }
   },
@@ -440,6 +577,21 @@
       "monthlyDate": "Every month on the {day, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}",
       "monthlyNth": "{nth, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} {weekday} of every month",
       "monthlyLast": "Last {weekday} of every month"
+    },
+    "videoCategories": {
+      "DIVINE_SERVICES": "Divine services",
+      "CHOIR_MUSIC": "Choir & music",
+      "YOUTH": "Youth",
+      "SPECIAL_EVENTS": "Special events",
+      "TEACHING": "Teaching"
+    },
+    "materialCategories": {
+      "DIVINE_SERVICE_HYMNS": "Divine service & hymns",
+      "SUNDAY_SCHOOL": "Sunday school & religious instruction",
+      "CONFIRMATION": "Confirmation class",
+      "YOUTH": "Youth",
+      "CHOIR_MUSIC": "Choir & music",
+      "NOTICES_FORMS": "Notices & forms"
     }
   },
   "Announcements": {
@@ -485,5 +637,34 @@
     "title": "Privacy notice",
     "version": "Version {version}, published {date}",
     "none": "The privacy notice will be published here before the membership form opens."
+  },
+  "Watch": {
+    "title": "Watch",
+    "intro": "Divine services, choir and music from the congregation. Videos only load when you tap play.",
+    "loading": "Loading…",
+    "empty": "No videos yet.",
+    "back": "All videos",
+    "play": "Play",
+    "openInApp": "Watch in the YouTube app",
+    "watchOnFacebook": "Watch on Facebook",
+    "facebookNote": "This video is on Facebook.",
+    "titlesOnly": "Show titles only (uses less data)",
+    "showThumbnails": "Show pictures",
+    "channel": "Our YouTube channel",
+    "facebookPage": "Our Facebook page"
+  },
+  "Resources": {
+    "title": "Resources",
+    "intro": "Materials to download. The type and size are shown before you download.",
+    "loading": "Loading…",
+    "empty": "No resources yet.",
+    "noResults": "Nothing matches your search.",
+    "search": "Search resources",
+    "searchButton": "Search",
+    "back": "All resources",
+    "updated": "updated {date}",
+    "type": "File",
+    "updatedLabel": "Updated",
+    "download": "Download ({size})"
   }
 }

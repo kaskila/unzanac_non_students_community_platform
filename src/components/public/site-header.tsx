@@ -6,6 +6,8 @@ export async function SiteHeader() {
   const links = [
     { href: "/announcements", label: t("nav.announcements") },
     { href: "/events", label: t("nav.events") },
+    { href: "/watch", label: t("nav.watch") },
+    { href: "/resources", label: t("nav.resources") },
     { href: "/committees", label: t("nav.committees") },
     { href: "/visit", label: t("nav.visit") },
   ];

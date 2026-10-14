@@ -12,6 +12,8 @@ export async function AdminNav() {
     { href: "/admin", label: t("nav.dashboard"), show: true },
     { href: "/admin/announcements", label: t("nav.announcements"), show: can(actor, "content.manage") },
     { href: "/admin/events", label: t("nav.events"), show: can(actor, "content.manage") },
+    { href: "/admin/media", label: t("nav.media"), show: can(actor, "media.manage") },
+    { href: "/admin/resources", label: t("nav.resources"), show: can(actor, "media.manage") },
     { href: "/admin/committees", label: t("nav.committees"), show: can(actor, "content.manage") },
     { href: "/admin/content", label: t("nav.content"), show: can(actor, "site.edit") },
     { href: "/admin/register", label: t("nav.register"), show: can(actor, "register.view") },

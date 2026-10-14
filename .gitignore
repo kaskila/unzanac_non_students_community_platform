@@ -49,3 +49,6 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 /.lighthouseci/
+
+# local file storage (src/server/storage/local.ts)
+/.storage/

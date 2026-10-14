@@ -79,6 +79,7 @@ export default async function SiteContentPage() {
 
       {section("social", <>
         <TextField name="youtube" type="url" inputMode="url" label={t("social.youtube")} defaultValue={site.social.youtube} />
+        <TextField name="youtubeChannelId" label={t("social.youtubeChannelId")} hint={t("social.youtubeChannelIdHint")} maxLength={30} defaultValue={site.social.youtubeChannelId} />
         <TextField name="facebook" type="url" inputMode="url" label={t("social.facebook")} hint={t("social.facebookHint")} defaultValue={site.social.facebook} />
         <TextField name="whatsappChannel" type="url" inputMode="url" label={t("social.whatsappChannel")} defaultValue={site.social.whatsappChannel} />
       </>)}

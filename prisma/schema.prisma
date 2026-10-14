@@ -26,6 +26,8 @@ model Committee {
 
   announcements Announcement[]
   events        Event[]
+  videos        Video[]
+  materials     Material[]
 }
 
 // ── Content (M2) ──
@@ -76,6 +78,7 @@ model Event {
   endsAt         DateTime         @db.Timestamptz(3)
   rrule          String? // RFC 5545 subset (src/lib/recurrence.ts); null = one-off
   isService      Boolean          @default(false) // a divine service: feeds the "Next service" card
+  livestreamUrl  String? // shows a "Live now" banner while an occurrence is running
   showInSchedule Boolean          @default(false)
   committeeId    String?
   committee      Committee?       @relation(fields: [committeeId], references: [id], onDelete: SetNull)
@@ -84,6 +87,7 @@ model Event {
   createdAt      DateTime         @default(now()) @db.Timestamptz(3)
   updatedAt      DateTime         @updatedAt @db.Timestamptz(3)
   exceptions     EventException[]
+  videos         Video[]
 
   @@index([status, startsAt])
 }
@@ -249,4 +253,114 @@ model RateLimit {
 
   @@unique([key])
   @@map("rateLimit")
+}
+
+// ── Media and resources (M2b) ──
+
+enum VideoSource {
+  YOUTUBE
+  FACEBOOK
+}
+
+enum VideoKind {
+  VIDEO
+  LIVE
+  PLAYLIST
+}
+
+enum VideoCategory {
+  DIVINE_SERVICES
+  CHOIR_MUSIC
+  YOUTH
+  SPECIAL_EVENTS
+  TEACHING
+}
+
+model Video {
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  source       VideoSource   @default(YOUTUBE)
+  externalId   String // YouTube video or playlist id; for Facebook, the video URL
+  kind         VideoKind     @default(VIDEO)
+  title        String
+  description  String?
+  category     VideoCategory @default(CHOIR_MUSIC)
+  thumbnailUrl String?
+  recordedAt   DateTime?     @db.Timestamptz(3)
+  featured     Boolean       @default(false) // at most one at a time (enforced in the service)
+  status       ContentStatus @default(DRAFT) // channel imports arrive as DRAFT
+  eventId      String?
+  event        Event?        @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  committeeId  String?
+  committee    Committee?    @relation(fields: [committeeId], references: [id], onDelete: SetNull)
+  importedAt   DateTime?     @db.Timestamptz(3) // set when it came from the channel feed
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime      @updatedAt @db.Timestamptz(3)
+
+  @@unique([source, externalId])
+  @@index([status, recordedAt])
+}
+
+enum MaterialCategory {
+  DIVINE_SERVICE_HYMNS
+  SUNDAY_SCHOOL
+  CONFIRMATION
+  YOUTH
+  CHOIR_MUSIC
+  NOTICES_FORMS
+}
+
+enum MaterialVisibility {
+  PUBLIC
+  UNLISTED // reachable by link only; MEMBERS arrives in Phase 2
+}
+
+model Material {
+  id            String             @id @default(cuid())
+  slug          String             @unique
+  title         String
+  description   String?
+  category      MaterialCategory
+  committeeId   String?
+  committee     Committee?         @relation(fields: [committeeId], references: [id], onDelete: SetNull)
+  visibility    MaterialVisibility @default(PUBLIC)
+  status        ContentStatus      @default(DRAFT)
+  currentFileId String?            @unique
+  currentFile   MaterialFile?      @relation("CurrentFile", fields: [currentFileId], references: [id], onDelete: SetNull)
+  downloadCount Int                @default(0)
+  expiresAt     DateTime?          @db.Timestamptz(3)
+  deletedAt     DateTime?          @db.Timestamptz(3) // soft delete; stored files are purged 30 days later
+  createdById   String
+  createdAt     DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime           @updatedAt @db.Timestamptz(3)
+  files         MaterialFile[]     @relation("Versions")
+
+  @@index([status, category])
+}
+
+model MaterialFile {
+  id           String    @id @default(cuid())
+  materialId   String
+  material     Material  @relation("Versions", fields: [materialId], references: [id], onDelete: Cascade)
+  currentOf    Material? @relation("CurrentFile")
+  storageKey   String    @unique // materials/<materialId>/<cuid>.<ext>
+  fileName     String // original name, sanitised
+  mimeType     String // detected from the file's content
+  sizeBytes    Int
+  sha256       String
+  uploadedById String
+  uploadedAt   DateTime  @default(now()) @db.Timestamptz(3)
+  purgedAt     DateTime? @db.Timestamptz(3) // stored object deleted
+}
+
+// Pending direct uploads: the presigned URL was issued but the upload isn't confirmed yet.
+model PendingUpload {
+  id          String   @id @default(cuid())
+  storageKey  String   @unique
+  materialId  String
+  fileName    String
+  sizeBytes   Int
+  createdById String
+  expiresAt   DateTime @db.Timestamptz(3)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
 }

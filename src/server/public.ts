@@ -112,6 +112,7 @@ const eventSelect = {
   rrule: true,
   isService: true,
   showInSchedule: true,
+  livestreamUrl: true,
   updatedAt: true,
   committee: { select: { slug: true, name: true, isPublic: true } },
   exceptions: { select: { occurrenceStart: true, cancelled: true, newStart: true, newEnd: true, note: true } },
@@ -189,6 +190,108 @@ export async function getPublicEvent(slug: string) {
     exceptions,
     upcoming: expandOccurrences(rest, exceptions, now, new Date(now.getTime() + 120 * DAY_MS), 8),
   };
+}
+
+/** Published events with a livestream link that are running right now (for the "Live now" banner). */
+export async function getLiveNow() {
+  "use cache";
+  cacheLife("public");
+  cacheTag(TAGS.events);
+  const now = new Date();
+  const events = (await publishedEvents()).filter((e) => e.livestreamUrl);
+  return upcoming(events, now, new Date(now.getTime() + 1), 1).filter((d) => !d.occurrence.cancelled && d.occurrence.start <= now);
+}
+
+// ── Videos ──
+
+const videoSelect = {
+  slug: true,
+  source: true,
+  kind: true,
+  externalId: true,
+  title: true,
+  description: true,
+  category: true,
+  thumbnailUrl: true,
+  recordedAt: true,
+  featured: true,
+  createdAt: true,
+} as const;
+
+export async function getPublishedVideos() {
+  "use cache";
+  cacheLife("public");
+  cacheTag(TAGS.videos);
+  return prisma.video.findMany({
+    where: { status: "PUBLISHED" },
+    orderBy: [{ recordedAt: { sort: "desc", nulls: "last" } }, { createdAt: "desc" }],
+    take: 200,
+    select: videoSelect,
+  });
+}
+
+/** The featured video, or else the newest one. */
+export async function getHomeVideo() {
+  "use cache";
+  cacheLife("public");
+  cacheTag(TAGS.videos);
+  return prisma.video.findFirst({
+    where: { status: "PUBLISHED" },
+    orderBy: [{ featured: "desc" }, { recordedAt: { sort: "desc", nulls: "last" } }, { createdAt: "desc" }],
+    select: videoSelect,
+  });
+}
+
+export async function getPublicVideo(slug: string) {
+  "use cache";
+  cacheLife("public");
+  cacheTag(TAGS.videos);
+  return prisma.video.findFirst({
+    where: { slug, status: "PUBLISHED" },
+    select: { ...videoSelect, committee: { select: { slug: true, name: true, isPublic: true } } },
+  });
+}
+
+// ── Resources ──
+
+function availableMaterialWhere(now: Date) {
+  return {
+    status: "PUBLISHED" as const,
+    deletedAt: null,
+    currentFileId: { not: null },
+    OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+  };
+}
+
+const materialSelect = {
+  slug: true,
+  title: true,
+  description: true,
+  category: true,
+  visibility: true,
+  updatedAt: true,
+  committee: { select: { slug: true, name: true, isPublic: true } },
+  currentFile: { select: { mimeType: true, sizeBytes: true, uploadedAt: true } },
+} as const;
+
+/** Listed resources: public ones only (unlisted ones are reachable by link alone). */
+export async function getPublicMaterials() {
+  "use cache";
+  cacheLife("public");
+  cacheTag(TAGS.materials);
+  return prisma.material.findMany({
+    where: { ...availableMaterialWhere(new Date()), visibility: "PUBLIC" },
+    orderBy: { updatedAt: "desc" },
+    take: 300,
+    select: materialSelect,
+  });
+}
+
+export async function getPublicMaterial(slug: string) {
+  "use cache";
+  cacheLife("public");
+  cacheTag(TAGS.materials);
+  return prisma.material.findFirst({ where: { slug, ...availableMaterialWhere(new Date()) }, select: materialSelect });
 }
 
 /** Slugs to prerender at build time (generateStaticParams). */

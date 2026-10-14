@@ -58,6 +58,14 @@ export async function EventForm({
         hint={t("fields.mapUrlHint")}
         defaultValue={event?.mapUrl}
       />
+      <TextField
+        name="livestreamUrl"
+        type="url"
+        inputMode="url"
+        label={t("fields.livestreamUrl")}
+        hint={t("fields.livestreamUrlHint")}
+        defaultValue={event?.livestreamUrl}
+      />
       <div className="grid gap-4 sm:grid-cols-2">
         <TextField name="audience" label={t("fields.audience")} hint={t("fields.audienceHint")} maxLength={60} defaultValue={event?.audience} />
         <SelectField

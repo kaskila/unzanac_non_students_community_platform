@@ -9,6 +9,11 @@ export const e2eEnv = {
   DIRECT_URL: E2E_DATABASE_URL,
   BETTER_AUTH_URL: E2E_BASE_URL,
   BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET ?? "e2e-only-secret-not-for-real-use-0123456789",
+  // Uploads go to .storage/ through /api/dev-storage; `next start` runs in production mode,
+  // where the local driver must be allowed explicitly (src/server/storage/index.ts).
+  STORAGE_DRIVER: "local",
+  ALLOW_LOCAL_STORAGE: "1",
+  CRON_SECRET: "e2e-cron-secret",
 };
 
 /** Refuse to reset anything that isn't clearly a test database. */

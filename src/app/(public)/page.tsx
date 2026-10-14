@@ -1,7 +1,9 @@
 import { getFormatter, getTranslations } from "next-intl/server";
 import { NavLink } from "@/components/public/nav-link";
 import { ScheduleList } from "@/components/public/schedule";
+import { VideoPlayer } from "@/components/public/video";
 import { ContactList, OccurrenceBadges, pub, ShareOnWhatsApp, When } from "@/components/public/ui";
+import { formatBytes, kindLabel } from "@/lib/file-rules";
 import { excerpt } from "@/lib/markdown";
 import { shareText } from "@/lib/share-text";
 import { siteUrl } from "@/lib/site";
@@ -11,16 +13,20 @@ import {
   getPublicCommittees,
   getRegularSchedule,
   getSiteContent,
+  getHomeVideo,
+  getLiveNow,
+  getPublicMaterials,
   getUpcomingEvents,
 } from "@/server/public";
 
 const LATEST_ANNOUNCEMENTS = 3;
 const THIS_WEEK_EVENTS = 5;
+const NEWEST_RESOURCES = 3;
 
 // Home page (docs/PLAN.md §3, "Home page sections"). All data comes from cached reads, so the
 // page is prerendered and refreshed when admins publish (src/server/public.ts).
 export default async function HomePage() {
-  const [t, format, site, nextService, announcements, thisWeek, schedule, committees] = await Promise.all([
+  const [t, format, site, nextService, announcements, thisWeek, schedule, committees, video, materials, live] = await Promise.all([
     getTranslations("Home"),
     getFormatter(),
     getSiteContent(),
@@ -29,12 +35,24 @@ export default async function HomePage() {
     getUpcomingEvents(7, THIS_WEEK_EVENTS),
     getRegularSchedule(),
     getPublicCommittees(),
+    getHomeVideo(),
+    getPublicMaterials(),
+    getLiveNow(),
   ]);
   const shown = [...announcements.filter((a) => a.pinned), ...announcements.filter((a) => !a.pinned).slice(0, LATEST_ANNOUNCEMENTS)];
   const mapUrl = nextService?.event.mapUrl || site.location.mapUrl;
 
   return (
     <>
+      {live.map(({ event }) => (
+        <p key={event.slug} role="status" className="bg-danger px-4 py-3 text-center font-semibold text-white">
+          <span aria-hidden="true">● </span>
+          {t("liveNow", { title: event.title })}{" "}
+          <a href={event.livestreamUrl!} rel="noopener" className="text-white">
+            {t("watchLive")}
+          </a>
+        </p>
+      ))}
       <section className="bg-azure-500">
         <div className={`${pub.container} pb-8 pt-10`}>
           {/* White on azure-500 is 3.27:1, so this title must stay >= 24px (text-3xl = 30px). */}
@@ -156,7 +174,20 @@ export default async function HomePage() {
         </ul>
       </section>
 
-      {site.social.youtube && (
+      {video && (
+        <section aria-labelledby="watch-title" className={`${pub.container} space-y-3 pt-10`}>
+          <h2 id="watch-title" className={pub.h2}>
+            {t("watchTitle")}
+          </h2>
+          <p className="font-semibold">{video.title}</p>
+          <VideoPlayer video={video} />
+          <NavLink href="/watch" className="inline-flex min-h-11 items-center">
+            {t("moreVideos")}
+          </NavLink>
+        </section>
+      )}
+
+      {!video && site.social.youtube && (
         <section aria-labelledby="watch-title" className={`${pub.container} pt-10`}>
           <h2 id="watch-title" className={pub.h2}>
             {t("watchTitle")}
@@ -165,6 +196,33 @@ export default async function HomePage() {
           <a href={site.social.youtube} rel="noopener" className={`mt-4 ${pub.primary}`}>
             {t("watchLink")}
           </a>
+        </section>
+      )}
+
+      {materials.length > 0 && (
+        <section aria-labelledby="resources-title" className={`${pub.container} pt-10`}>
+          <h2 id="resources-title" className={pub.h2}>
+            {t("resourcesTitle")}
+          </h2>
+          <ul className="mt-4 space-y-3">
+            {materials.slice(0, NEWEST_RESOURCES).map((m) => (
+              <li key={m.slug} className={pub.card}>
+                <NavLink href={`/resources/${m.slug}`} className="font-semibold">
+                  {m.title}
+                </NavLink>
+                {m.currentFile && (
+                  <p className="text-sm text-muted">
+                    {kindLabel(m.currentFile.mimeType)} · {formatBytes(m.currentFile.sizeBytes)}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3">
+            <NavLink href="/resources" className="inline-flex min-h-11 items-center">
+              {t("allResources")}
+            </NavLink>
+          </p>
         </section>
       )}
 
