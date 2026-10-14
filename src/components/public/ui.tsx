@@ -10,9 +10,12 @@ import { whatsAppChatUrl, whatsAppShareUrl } from "@/lib/share-text";
 
 export const pub = {
   container: "mx-auto w-full max-w-3xl px-4",
-  h1: "text-3xl font-bold text-azure-900",
-  h2: "text-2xl font-bold text-azure-900",
-  h3: "text-lg font-bold text-azure-900",
+  // Headings follow nac.today: large, medium weight, solid brand Azure. Azure-500 is only 3.27:1 on white, so it
+  // is used at 30px and above (WCAG large text), and only on white (2.97:1 on azure-50, too low);
+  // smaller headings stay azure-900.
+  h1: "text-4xl font-medium leading-tight tracking-tight text-azure-500 sm:text-5xl",
+  h2: "text-3xl font-medium leading-tight tracking-tight text-azure-500",
+  h3: "text-lg font-semibold text-azure-900",
   card: "rounded-lg border border-line bg-white p-4",
   muted: "text-muted",
   primary:

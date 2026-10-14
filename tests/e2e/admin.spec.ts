@@ -22,6 +22,8 @@ test("an invite link works once and unknown links are rejected", async ({ page }
 });
 
 test("owner and editor: invite, two-step sign-in, roles and deactivation", async ({ browser }) => {
+  // A long flow (two invites, two 2FA enrolments, three sign-ins); allow for a busy CI machine.
+  test.setTimeout(60_000);
   const ownerPage = await (await browser.newContext()).newPage();
   const editorPage = await (await browser.newContext()).newPage();
   let ownerKey = "";

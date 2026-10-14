@@ -55,8 +55,8 @@ export default async function HomePage() {
       ))}
       <section className="bg-azure-500">
         <div className={`${pub.container} pb-8 pt-10`}>
-          {/* White on azure-500 is 3.27:1, so this title must stay >= 24px (text-3xl = 30px). */}
-          <h1 className="text-3xl font-bold text-white">{site.hero.title}</h1>
+          {/* White on azure-500 is 3.27:1, so this title must stay >= 24px (text-4xl = 36px). */}
+          <h1 className="text-4xl font-medium leading-tight tracking-tight text-white sm:text-5xl">{site.hero.title}</h1>
           <div className="mt-5 rounded-lg bg-white p-5 shadow-sm">
             <p>{site.hero.body}</p>
             <h2 className="mt-4 text-lg font-bold text-azure-900">{t("nextServiceTitle")}</h2>
@@ -181,9 +181,16 @@ export default async function HomePage() {
           </h2>
           <p className="font-semibold">{video.title}</p>
           <VideoPlayer video={video} />
-          <NavLink href="/watch" className="inline-flex min-h-11 items-center">
-            {t("moreVideos")}
-          </NavLink>
+          <p className="flex flex-wrap gap-x-5">
+            <NavLink href="/watch" className="inline-flex min-h-11 items-center">
+              {t("moreVideos")}
+            </NavLink>
+            {site.social.youtube && (
+              <a href={site.social.youtube} rel="noopener" className="inline-flex min-h-11 items-center">
+                {t("watchLink")}
+              </a>
+            )}
+          </p>
         </section>
       )}
 
@@ -227,7 +234,7 @@ export default async function HomePage() {
       )}
 
       <section aria-labelledby="new-title" className={`${pub.container} pt-10`}>
-        <div className="rounded-lg bg-azure-50 p-5">
+        <div className="rounded-lg border border-line border-l-4 border-l-azure-500 bg-white p-5">
           <h2 id="new-title" className={pub.h2}>
             {t("newHereTitle")}
           </h2>

@@ -77,9 +77,12 @@ test("journey 7: an editor adds a YouTube video; the Watch page loads no YouTube
   await page.getByRole("button", { name: "Play: Choir: Abide with me" }).click();
   await expect(page.locator("iframe")).toHaveAttribute("src", `https://www.youtube-nocookie.com/embed/${VIDEO_ID}?autoplay=1&rel=0`);
 
-  // The featured video is on the home page.
-  await page.goto("/");
-  await expect(page.getByRole("region", { name: "Watch and listen" })).toContainText("Choir: Abide with me");
+  // The featured video is on the home page. Other spec files load "/" in parallel, so a render that
+  // started before the publish may land just after it; reload until the fresh page is served.
+  await expect(async () => {
+    await page.goto("/");
+    await expect(page.getByRole("region", { name: "Watch and listen" })).toContainText("Choir: Abide with me", { timeout: 1000 });
+  }).toPass({ timeout: 20_000 });
 });
 
 async function createResource(title: string, options: { unlisted?: boolean } = {}) {

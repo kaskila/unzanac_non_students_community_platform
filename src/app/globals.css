@@ -54,7 +54,7 @@
 /* Text rendered from limited Markdown (src/lib/markdown.ts). */
 @layer components {
   .prose > * + * {
-    margin-top: 0.75rem;
+    margin-top: 1.25rem;
   }
   .prose ul {
     list-style: disc;
