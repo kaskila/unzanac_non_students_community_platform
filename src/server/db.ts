@@ -2,7 +2,9 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 
 // One client per process. In development, hot reload would otherwise open a new pool on every change.
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+// The cached client is replaced when `prisma generate` produces a new PrismaClient class (after a
+// migration), so a running `npm run dev` picks up new models without a restart.
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient; prismaClass?: typeof PrismaClient };
 
 function createClient() {
   const connectionString = process.env.DATABASE_URL;
@@ -12,8 +14,16 @@ function createClient() {
   return new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 }
 
-export const prisma = globalForPrisma.prisma ?? createClient();
+function cachedClient(): PrismaClient {
+  const cached = globalForPrisma.prisma;
+  if (cached && globalForPrisma.prismaClass === PrismaClient) return cached;
+  void cached?.$disconnect(); // stale client from before a regenerate
+  return createClient();
+}
+
+export const prisma = process.env.NODE_ENV === "production" ? createClient() : cachedClient();
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
+  globalForPrisma.prismaClass = PrismaClient;
 }
