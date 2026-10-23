@@ -5,6 +5,7 @@ import { ScheduleList } from "@/components/public/schedule";
 import { VideoPlayer } from "@/components/public/video";
 import { ContactList, OccurrenceBadges, pub, ShareOnWhatsApp, When } from "@/components/public/ui";
 import { formatBytes, kindLabel } from "@/lib/file-rules";
+import { defaultHeroSlides, heroImageUrl, heroSrcSet, type CarouselSlide } from "@/lib/hero";
 import { excerpt } from "@/lib/markdown";
 import { shareText } from "@/lib/share-text";
 import { siteUrl } from "@/lib/site";
@@ -28,7 +29,7 @@ const NEWEST_RESOURCES = 3;
 // Home page (docs/PLAN.md §3, "Home page sections"). All data comes from cached reads, so the
 // page is prerendered and refreshed when admins publish (src/server/public.ts).
 export default async function HomePage() {
-  const [t, format, site, nextService, announcements, thisWeek, schedule, committees, video, materials, live, slides] = await Promise.all([
+  const [t, format, site, nextService, announcements, thisWeek, schedule, committees, video, materials, live, uploaded] = await Promise.all([
     getTranslations("Home"),
     getFormatter(),
     getSiteContent(),
@@ -42,6 +43,10 @@ export default async function HomePage() {
     getLiveNow(),
     getHeroSlides(),
   ]);
+  // Admins' uploads (Admin → Home photos) replace the built-in congregation photos.
+  const heroSlides: CarouselSlide[] = uploaded.length
+    ? uploaded.map((s) => ({ id: s.id, alt: s.alt, src: heroImageUrl(s.id, s.version, 960), srcSet: heroSrcSet(s.id, s.version) }))
+    : defaultHeroSlides();
   const shown = [...announcements.filter((a) => a.pinned), ...announcements.filter((a) => !a.pinned).slice(0, LATEST_ANNOUNCEMENTS)];
   const mapUrl = nextService?.event.mapUrl || site.location.mapUrl;
 
@@ -56,20 +61,20 @@ export default async function HomePage() {
           </a>
         </p>
       ))}
-      {slides.length > 0 && (
+      {heroSlides.length > 0 && (
         <HeroCarousel
-          slides={slides}
-          labels={{ region: t("photos"), previous: t("previousPhoto"), next: t("nextPhoto"), slide: t("photoOf") }}
+          slides={heroSlides}
+          labels={{ region: t("photos"), previous: t("previousPhoto"), next: t("nextPhoto"), slide: t("photoOf", { n: "{n}", count: "{count}" }) }}
         />
       )}
       {/* With photos the welcome sits on white below them; without, on the Azure band. */}
-      <section className={slides.length > 0 ? "" : "bg-azure-500"}>
+      <section className={heroSlides.length > 0 ? "" : "bg-azure-500"}>
         <div className={`${pub.container} pb-8 pt-10`}>
           {/* White on azure-500 is 3.27:1, so this title must stay >= 24px (text-4xl = 36px). */}
-          <h1 className={slides.length > 0 ? pub.h1 : "text-4xl font-medium leading-tight tracking-tight text-white sm:text-5xl"}>
+          <h1 className={heroSlides.length > 0 ? pub.h1 : "text-4xl font-medium leading-tight tracking-tight text-white sm:text-5xl"}>
             {site.hero.title}
           </h1>
-          <div className={`mt-5 rounded-lg bg-white p-5 ${slides.length > 0 ? "border border-line" : "shadow-sm"}`}>
+          <div className={`mt-5 rounded-lg bg-white p-5 ${heroSlides.length > 0 ? "border border-line" : "shadow-sm"}`}>
             <p>{site.hero.body}</p>
             <h2 className="mt-4 text-lg font-bold text-azure-900">{t("nextServiceTitle")}</h2>
             {nextService ? (

@@ -1,16 +1,14 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { heroImageUrl, heroSrcSet } from "@/lib/hero";
-
-type Slide = { id: string; alt: string; version: string };
+import type { CarouselSlide } from "@/lib/hero";
 
 /**
  * The home page photo slider (landing redesign). Swiping works without JavaScript (CSS scroll
  * snap); the arrows need it. To save data, only the first photo loads with the page: the others
  * are added once the visitor swipes or taps an arrow.
  */
-export function HeroCarousel({ slides, labels }: { slides: Slide[]; labels: { region: string; previous: string; next: string; slide: string } }) {
+export function HeroCarousel({ slides, labels }: { slides: CarouselSlide[]; labels: { region: string; previous: string; next: string; slide: string } }) {
   const scroller = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [loadAll, setLoadAll] = useState(false);
@@ -47,8 +45,8 @@ export function HeroCarousel({ slides, labels }: { slides: Slide[]; labels: { re
             {(i === 0 || loadAll) && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={heroImageUrl(slide.id, slide.version, 960)}
-                srcSet={heroSrcSet(slide.id, slide.version)}
+                src={slide.src}
+                srcSet={slide.srcSet}
                 sizes="(min-width: 1152px) 1152px, 100vw"
                 alt={slide.alt}
                 width={960}

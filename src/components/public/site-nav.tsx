@@ -7,10 +7,10 @@ type Props = {
   labels: { label: string; menu: string; search: string; searchPlaceholder: string };
 };
 
-// White text on brand Azure is 3.27:1, enough only for large text: menu text is 19px bold
-// (WCAG "large", 3:1). No hooks here: CurrentSiteNav (client) passes the current path, and the
+// White text on brand Azure is 3.27:1, enough only for large text: menu text is 18.7px bold, the
+// smallest size WCAG counts as large (14pt bold), so 3:1 applies. Don't go smaller on this Azure. No hooks here: CurrentSiteNav (client) passes the current path, and the
 // header renders this without one as the Suspense fallback in the prerendered shell.
-const linkClass = "inline-flex min-h-11 items-center text-[19px] font-bold uppercase tracking-wide text-white no-underline";
+const linkClass = "inline-flex min-h-11 items-center text-[18.7px] font-bold uppercase text-white no-underline";
 
 function isCurrent(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);

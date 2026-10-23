@@ -3,7 +3,7 @@ import { fileTypeFromBuffer } from "file-type";
 import sharp from "sharp";
 import { z } from "zod";
 import { checkFile } from "@/lib/file-rules";
-import { HERO_WIDTHS, heroImageKey } from "@/lib/hero";
+import { HERO_ASPECT, HERO_QUALITY, HERO_WIDTHS, heroImageKey } from "@/lib/hero";
 import { audit } from "@/server/audit";
 import { prisma } from "@/server/db";
 import { ServiceError } from "@/server/errors";
@@ -17,8 +17,6 @@ import { storage, UPLOAD_URL_SECONDS } from "@/server/storage";
 // (such as GPS location). The original upload is deleted.
 
 const PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
-const ASPECT = 7 / 16; // height / width, like the mockup's banner
-const QUALITY = 60;
 
 function assertCanEdit(actor: Actor) {
   if (!can(actor, "site.edit")) throw new ServiceError("forbidden");
@@ -83,8 +81,8 @@ export async function finishSlideUpload(actor: Actor, uploadId: string) {
     for (const width of HERO_WIDTHS) {
       const webp = await sharp(original)
         .rotate() // respect the phone's orientation flag before it is dropped
-        .resize({ width, height: Math.round(width * ASPECT), fit: "cover", position: "attention" })
-        .webp({ quality: QUALITY })
+        .resize({ width, height: Math.round(width * HERO_ASPECT), fit: "cover", position: "attention" })
+        .webp({ quality: HERO_QUALITY })
         .toBuffer();
       await store.put(heroImageKey(pending.targetId, version, width), new Uint8Array(webp), "image/webp");
     }
