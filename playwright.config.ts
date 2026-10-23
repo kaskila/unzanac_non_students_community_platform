@@ -10,6 +10,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
+  // Server-rendered admin steps (sign-in, 2FA, uploads) can take several seconds on a busy machine.
+  expect: { timeout: 10_000 },
   use: {
     baseURL: E2E_BASE_URL,
     trace: "retain-on-failure",

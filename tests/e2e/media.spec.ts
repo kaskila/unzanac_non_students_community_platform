@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { E2E_BASE_URL } from "./env";
-import { acceptInvite, alertMessage, enrolTwoFactor, inviteAdmin, signIn } from "./helpers";
+import { acceptInvite, alertMessage, enrolTwoFactor, gotoFresh, inviteAdmin, signIn } from "./helpers";
 
 // M2b exit criteria (docs/PLAN.md §11): journeys 7 (videos) and 8 (resources).
 const EDITOR = { email: "media@example.org", name: "Media Editor", password: "media-password-123" };
@@ -38,6 +38,8 @@ async function expectNoAxeViolations(page: Page) {
 }
 
 test("journey 7: an editor adds a YouTube video; the Watch page loads no YouTube code until play", async ({ page }) => {
+  // Calls YouTube for the title (up to 5 s) and reloads the home page until it is fresh.
+  test.setTimeout(60_000);
   await admin.goto("/admin/media");
   await expect(admin.getByRole("heading", { level: 1, name: "Media" })).toBeVisible();
   await admin.getByLabel("Video link").fill("https://example.org/not-a-video");
@@ -47,7 +49,7 @@ test("journey 7: an editor adds a YouTube video; the Watch page loads no YouTube
 
   await admin.getByLabel("Video link").fill(`https://youtu.be/${VIDEO_ID}?si=shared`);
   await admin.getByRole("button", { name: "Add video" }).click();
-  await expect(admin).toHaveURL(/\/admin\/media\/[a-z0-9]+$/);
+  await expect(admin).toHaveURL(/\/admin\/media\/[a-z0-9]+$/, { timeout: 15_000 });
   // The title comes from YouTube when it answers; set our own either way.
   await admin.getByLabel("Title").fill("Choir: Abide with me");
   await admin.getByLabel("Category").selectOption("CHOIR_MUSIC");
@@ -79,10 +81,9 @@ test("journey 7: an editor adds a YouTube video; the Watch page loads no YouTube
 
   // The featured video is on the home page. Other spec files load "/" in parallel, so a render that
   // started before the publish may land just after it; reload until the fresh page is served.
-  await expect(async () => {
-    await page.goto("/");
-    await expect(page.getByRole("region", { name: "Watch and listen" })).toContainText("Choir: Abide with me", { timeout: 1000 });
-  }).toPass({ timeout: 20_000 });
+  await gotoFresh(page, "/", () =>
+    expect(page.getByRole("region", { name: "Watch and listen" })).toContainText("Choir: Abide with me", { timeout: 1000 }),
+  );
 });
 
 async function createResource(title: string, options: { unlisted?: boolean } = {}) {

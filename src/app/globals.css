@@ -17,6 +17,7 @@
   --color-ink: #1a2433;
   --color-muted: #5b6675;
   --color-line: #e6edf4;
+  --color-paper: #f4f5f7; /* page background around the white content panels */
   --color-success: #1d6b40;
   --color-warning: #8a5300;
   --color-danger: #b42318;

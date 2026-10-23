@@ -31,6 +31,7 @@ export const SITE_CONTENT_SCHEMAS = {
   hero: z.object({ title: text(80).min(1), body: text(300).min(1) }),
   location: z.object({ name: text(100).min(1), address: text(200), mapUrl: optionalUrl }),
   visit: z.object({ body: text(4000).min(1) }),
+  about: z.object({ body: text(6000).min(1) }),
   contacts: z.object({ items: z.array(contact).max(8) }),
   social: z.object({
     youtube: optionalUrl,
@@ -74,6 +75,15 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       "- Come as you are; you don't need to know anyone",
       "",
       "Ask any minister or usher after the service if you have questions.",
+    ].join("\n"),
+  },
+  about: {
+    body: [
+      "UNZANAC is the UNZA congregation of the New Apostolic Church in Zambia. We meet near the University of Zambia, and our members include students, staff, families and neighbours.",
+      "",
+      "The New Apostolic Church is a Christian church with over nine million members in some 200 countries. It professes the Bible and the foundations of Christianity, is led by Apostles, and celebrates three sacraments: Holy Baptism, Holy Sealing and Holy Communion.",
+      "",
+      "Our congregation serves through nine committees, from the choir and orchestra to first aid and catering. [Meet the committees](/committees) or [plan your visit](/visit).",
     ].join("\n"),
   },
   contacts: { items: [] },

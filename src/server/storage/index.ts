@@ -28,6 +28,12 @@ export interface StorageDriver {
   /** URL that downloads the object as an attachment, valid DOWNLOAD_URL_SECONDS. */
   presignDownload(key: string, fileName: string, contentType: string): Promise<string>;
   remove(key: string): Promise<void>;
+  /** The whole object (used for photos, which are at most 10 MB). */
+  read(key: string): Promise<Uint8Array>;
+  /** Store bytes written by the server itself (e.g. resized photos). */
+  put(key: string, body: Uint8Array, contentType: string): Promise<void>;
+  /** Stream an object, for serving public photos through the site. */
+  stream(key: string): Promise<ReadableStream<Uint8Array> | null>;
 }
 
 let driver: StorageDriver | null = null;

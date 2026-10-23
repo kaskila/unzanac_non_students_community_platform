@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { toLocalInput } from "../../src/lib/dates";
-import { acceptInvite, alertMessage, enrolTwoFactor, inviteAdmin, signIn } from "./helpers";
+import { acceptInvite, alertMessage, enrolTwoFactor, gotoFresh, inviteAdmin, signIn } from "./helpers";
 
 // M2 exit criteria (docs/PLAN.md §11): journeys 1 and 2, plus accessibility on every public page.
 // A register officer can manage content and site content. Using one (not an owner) keeps the
@@ -59,8 +59,8 @@ test("journey 1: an admin publishes an announcement and it appears on the home p
   await admin.getByRole("button", { name: "Save draft" }).click();
   await expect(admin).toHaveURL(/\/admin\/announcements$/);
 
-  await page.goto("/");
   const section = page.getByRole("region", { name: "Announcements" });
+  await gotoFresh(page, "/", () => expect(section).toContainText("Youth day", { timeout: 1000 }));
   await expect(section.getByRole("link", { name: "Youth day: sports & fellowship", exact: true })).toBeVisible();
   await expect(section).not.toContainText("Draft notice");
   await expect(section.getByRole("link", { name: /Share on WhatsApp/ })).toHaveAttribute("href", /^https:\/\/wa\.me\/\?text=/);
@@ -143,9 +143,8 @@ test("site content edits appear on the public site", async ({ page }) => {
   await privacy.getByRole("button", { name: "Publish new version" }).click();
   await expect(privacy.getByRole("status")).toHaveText("Published.");
 
-  await page.goto("/");
   const contactsSection = page.getByRole("region", { name: "Contacts" });
-  await expect(contactsSection).toContainText("Pr. Mwila");
+  await gotoFresh(page, "/", () => expect(contactsSection).toContainText("Pr. Mwila", { timeout: 1000 }));
   await expect(contactsSection.getByRole("link", { name: "+260 97 123 4567" })).toHaveAttribute("href", "tel:+260971234567");
   await expect(contactsSection.getByRole("link", { name: /WhatsApp/ })).toHaveAttribute("href", "https://wa.me/260971234567");
 
@@ -154,8 +153,91 @@ test("site content edits appear on the public site", async ({ page }) => {
   await expect(page.getByText("We collect only what the congregation needs.")).toBeVisible();
 });
 
+test("the menu, search box and current-page mark work", async ({ page }) => {
+  await page.goto("/committees");
+  const menu = page.getByRole("navigation", { name: "Main menu" });
+  // 360px: the links sit behind "Menu".
+  await menu.getByText("Menu").click();
+  await expect(menu.getByRole("link", { name: "Committees" })).toHaveAttribute("aria-current", "page");
+  await menu.getByRole("link", { name: "Activities" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Activities" })).toBeVisible();
+
+  await page.getByRole("searchbox", { name: "Search" }).fill("youth day");
+  await page.getByRole("button", { name: "Search" }).click();
+  await expect(page).toHaveURL(/\/search\?q=youth\+day$/);
+  await expect(page.getByRole("status")).toContainText('1 result for "youth day"');
+  await expect(page.getByRole("link", { name: "Youth day: sports & fellowship" })).toBeVisible();
+
+  await page.getByRole("link", { name: "Contact" }).first().click();
+  await expect(page.getByRole("heading", { level: 1, name: "Contact" })).toBeVisible();
+  await expect(page.getByText("Pr. Mwila").first()).toBeVisible();
+});
+
+// 1×1 PNG: enough for the server to detect, resize and convert.
+const PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+  "base64",
+);
+
+test("home photos: uploaded, resized, and only the first one downloads with the page", async ({ page }) => {
+  await admin.goto("/admin/home-photos");
+  await expect(admin.getByRole("heading", { level: 1, name: "Home photos" })).toBeVisible();
+  await expectNoAxeViolations(admin);
+
+  // A description is required, and the file must really be a photo.
+  await admin.getByLabel("Photo", { exact: true }).setInputFiles({ name: "group.png", mimeType: "image/png", buffer: PNG });
+  await admin.getByRole("button", { name: "Upload photo" }).click();
+  await expect(alertMessage(admin)).toContainText("Describe the photo first");
+  await admin.getByLabel("Description", { exact: true }).first().fill("Not a photo");
+  await admin.getByLabel("Photo", { exact: true }).setInputFiles({ name: "fake.png", mimeType: "image/png", buffer: Buffer.from("%PDF-1.4 not an image") });
+  await admin.getByRole("button", { name: "Upload photo" }).click();
+  await expect(alertMessage(admin)).toContainText("Use a JPG, PNG or WebP photo.");
+
+  for (const alt of ["Members after the youth service", "The choir on Easter Sunday"]) {
+    await admin.getByLabel("Description", { exact: true }).first().fill(alt);
+    await admin.getByLabel("Photo", { exact: true }).setInputFiles({ name: "photo.png", mimeType: "image/png", buffer: PNG });
+    await admin.getByRole("button", { name: "Upload photo" }).click();
+    await expect(admin.getByRole("status").filter({ hasText: "Photo added." })).toBeVisible();
+  }
+  await expect(admin.getByTestId("home-photo")).toHaveCount(2);
+
+  const photoRequests: string[] = [];
+  page.on("request", (r) => r.url().includes("/images/hero/") && photoRequests.push(r.url()));
+  await gotoFresh(page, "/", () =>
+    expect(page.getByRole("img", { name: "Members after the youth service" })).toBeVisible({ timeout: 1000 }),
+  );
+  await expect(page.getByRole("heading", { level: 1, name: "Welcome to UNZANAC" })).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  expect(new Set(photoRequests.map((u) => u.split("/")[5])).size, "only the first photo loads").toBe(1);
+  await expectNoAxeViolations(page);
+
+  const response = await page.request.get(photoRequests[0]);
+  expect(response.headers()["content-type"]).toBe("image/webp");
+  expect(response.headers()["cache-control"]).toContain("immutable");
+
+  await page.getByRole("button", { name: "Next photo" }).click();
+  await expect(page.getByRole("img", { name: "The choir on Easter Sunday" })).toBeAttached();
+
+  // Clean up so other spec files see the home page without photos.
+  for (let i = 0; i < 2; i++) {
+    await admin.getByRole("button", { name: /^Delete photo/ }).first().click();
+    await expect(admin.getByTestId("home-photo")).toHaveCount(1 - i);
+  }
+});
+
 test("every public page is accessible and fits a 360px screen", async ({ page }) => {
-  for (const path of ["/", "/announcements", "/events", "/committees", "/committees/music", "/visit", "/privacy"]) {
+  for (const path of [
+    "/",
+    "/announcements",
+    "/events",
+    "/committees",
+    "/committees/music",
+    "/visit",
+    "/privacy",
+    "/about",
+    "/contact",
+    "/search?q=youth",
+  ]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);

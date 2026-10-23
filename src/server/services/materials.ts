@@ -95,8 +95,9 @@ export async function requestUpload(actor: Actor, materialId: string, input: { f
   const storageKey = `materials/${materialId}/${randomBytes(12).toString("base64url")}.file`;
   const pending = await prisma.pendingUpload.create({
     data: {
+      kind: "MATERIAL",
       storageKey,
-      materialId,
+      targetId: materialId,
       fileName,
       sizeBytes: size,
       createdById: actor.id,
@@ -114,7 +115,7 @@ export async function requestUpload(actor: Actor, materialId: string, input: { f
 export async function confirmUpload(actor: Actor, uploadId: string) {
   assertCan(actor, "media.manage");
   const pending = await prisma.pendingUpload.findUnique({ where: { id: uploadId } });
-  if (!pending || pending.expiresAt < new Date()) throw new ServiceError("upload_expired");
+  if (!pending || pending.kind !== "MATERIAL" || pending.expiresAt < new Date()) throw new ServiceError("upload_expired");
   const store = storage();
 
   const size = await store.size(pending.storageKey);
@@ -128,7 +129,7 @@ export async function confirmUpload(actor: Actor, uploadId: string) {
       actorId: actor.id,
       action: "material.upload_rejected",
       entityType: "material",
-      entityId: pending.materialId,
+      entityId: pending.targetId,
       meta: { reason: check.reason, detected: detected?.mime ?? null, size },
     });
     throw new ServiceError(`file_${check.reason}`);
@@ -138,7 +139,7 @@ export async function confirmUpload(actor: Actor, uploadId: string) {
   const file = await prisma.$transaction(async (tx) => {
     const created = await tx.materialFile.create({
       data: {
-        materialId: pending.materialId,
+        materialId: pending.targetId,
         storageKey: pending.storageKey,
         fileName: sanitizeFileName(pending.fileName, check.kind.ext),
         mimeType: check.mimeType,
@@ -147,7 +148,7 @@ export async function confirmUpload(actor: Actor, uploadId: string) {
         uploadedById: actor.id,
       },
     });
-    await tx.material.update({ where: { id: pending.materialId }, data: { currentFileId: created.id } });
+    await tx.material.update({ where: { id: pending.targetId }, data: { currentFileId: created.id } });
     await tx.pendingUpload.delete({ where: { id: pending.id } });
     return created;
   });
@@ -155,7 +156,7 @@ export async function confirmUpload(actor: Actor, uploadId: string) {
     actorId: actor.id,
     action: "material.upload",
     entityType: "material",
-    entityId: pending.materialId,
+    entityId: pending.targetId,
     meta: { fileId: file.id, type: check.mimeType, size },
   });
   return file;

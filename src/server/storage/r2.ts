@@ -74,5 +74,24 @@ export function r2StorageDriver(): StorageDriver {
     async remove(key) {
       await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
     },
+
+    async read(key) {
+      const object = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+      return (await object.Body?.transformToByteArray()) ?? new Uint8Array();
+    },
+
+    async put(key, body, contentType) {
+      await client.send(new PutObjectCommand({ Bucket: bucket, Key: key, Body: body, ContentType: contentType }));
+    },
+
+    async stream(key) {
+      try {
+        const object = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+        return (object.Body?.transformToWebStream() as ReadableStream<Uint8Array> | undefined) ?? null;
+      } catch (error) {
+        if (error instanceof S3ServiceException && error.$metadata.httpStatusCode === 404) return null;
+        throw error;
+      }
+    },
   };
 }

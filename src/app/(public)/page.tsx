@@ -1,4 +1,5 @@
 import { getFormatter, getTranslations } from "next-intl/server";
+import { HeroCarousel } from "@/components/public/hero-carousel";
 import { NavLink } from "@/components/public/nav-link";
 import { ScheduleList } from "@/components/public/schedule";
 import { VideoPlayer } from "@/components/public/video";
@@ -13,6 +14,7 @@ import {
   getPublicCommittees,
   getRegularSchedule,
   getSiteContent,
+  getHeroSlides,
   getHomeVideo,
   getLiveNow,
   getPublicMaterials,
@@ -26,7 +28,7 @@ const NEWEST_RESOURCES = 3;
 // Home page (docs/PLAN.md §3, "Home page sections"). All data comes from cached reads, so the
 // page is prerendered and refreshed when admins publish (src/server/public.ts).
 export default async function HomePage() {
-  const [t, format, site, nextService, announcements, thisWeek, schedule, committees, video, materials, live] = await Promise.all([
+  const [t, format, site, nextService, announcements, thisWeek, schedule, committees, video, materials, live, slides] = await Promise.all([
     getTranslations("Home"),
     getFormatter(),
     getSiteContent(),
@@ -38,6 +40,7 @@ export default async function HomePage() {
     getHomeVideo(),
     getPublicMaterials(),
     getLiveNow(),
+    getHeroSlides(),
   ]);
   const shown = [...announcements.filter((a) => a.pinned), ...announcements.filter((a) => !a.pinned).slice(0, LATEST_ANNOUNCEMENTS)];
   const mapUrl = nextService?.event.mapUrl || site.location.mapUrl;
@@ -53,11 +56,20 @@ export default async function HomePage() {
           </a>
         </p>
       ))}
-      <section className="bg-azure-500">
+      {slides.length > 0 && (
+        <HeroCarousel
+          slides={slides}
+          labels={{ region: t("photos"), previous: t("previousPhoto"), next: t("nextPhoto"), slide: t("photoOf") }}
+        />
+      )}
+      {/* With photos the welcome sits on white below them; without, on the Azure band. */}
+      <section className={slides.length > 0 ? "" : "bg-azure-500"}>
         <div className={`${pub.container} pb-8 pt-10`}>
           {/* White on azure-500 is 3.27:1, so this title must stay >= 24px (text-4xl = 36px). */}
-          <h1 className="text-4xl font-medium leading-tight tracking-tight text-white sm:text-5xl">{site.hero.title}</h1>
-          <div className="mt-5 rounded-lg bg-white p-5 shadow-sm">
+          <h1 className={slides.length > 0 ? pub.h1 : "text-4xl font-medium leading-tight tracking-tight text-white sm:text-5xl"}>
+            {site.hero.title}
+          </h1>
+          <div className={`mt-5 rounded-lg bg-white p-5 ${slides.length > 0 ? "border border-line" : "shadow-sm"}`}>
             <p>{site.hero.body}</p>
             <h2 className="mt-4 text-lg font-bold text-azure-900">{t("nextServiceTitle")}</h2>
             {nextService ? (

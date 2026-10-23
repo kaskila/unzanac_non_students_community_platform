@@ -8,4 +8,5 @@ export const TAGS = {
   events: "events",
   videos: "videos",
   materials: "materials",
+  hero: "hero-slides",
 } as const;

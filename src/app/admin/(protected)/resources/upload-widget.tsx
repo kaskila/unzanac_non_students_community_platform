@@ -2,24 +2,12 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { putWithProgress } from "@/components/admin/direct-upload";
 import { ui } from "@/components/admin/ui";
 import { ACCEPT_ATTRIBUTE } from "@/lib/file-rules";
 import { finishUploadAction, startUploadAction } from "./actions";
 
 type Phase = { name: "idle" } | { name: "uploading"; percent: number } | { name: "checking" } | { name: "done" } | { name: "error"; code: string };
-
-/** PUT bytes to the presigned URL with progress (fetch can't report upload progress). */
-function put(url: string, headers: Record<string, string>, file: File, onProgress: (percent: number) => void) {
-  return new Promise<void>((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("PUT", url);
-    for (const [name, value] of Object.entries(headers)) xhr.setRequestHeader(name, value);
-    xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(Math.round((e.loaded / e.total) * 100));
-    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(String(xhr.status))));
-    xhr.onerror = () => reject(new Error("network"));
-    xhr.send(file);
-  });
-}
 
 /**
  * Uploads a file straight to storage (docs/PLAN.md §3.2): ask the server for a presigned URL, PUT
@@ -39,7 +27,7 @@ export function UploadWidget({ materialId, replacing }: { materialId: string; re
     const start = await startUploadAction(materialId, file.name, file.size);
     if ("error" in start) return setPhase({ name: "error", code: start.error });
     try {
-      await put(start.url, start.headers, file, (percent) => setPhase({ name: "uploading", percent }));
+      await putWithProgress(start.url, start.headers, file, (percent) => setPhase({ name: "uploading", percent }));
     } catch {
       return setPhase({ name: "error", code: "upload_failed" });
     }

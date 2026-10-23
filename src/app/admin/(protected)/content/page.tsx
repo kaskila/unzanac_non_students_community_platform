@@ -54,6 +54,10 @@ export default async function SiteContentPage() {
         <TextArea id="field-visit-body" name="body" label={t("visit.body")} hint={t("markdownHint")} rows={10} maxLength={4000} defaultValue={site.visit.body} />
       </>)}
 
+      {section("about", <>
+        <TextArea id="field-about-body" name="body" label={t("about.body")} hint={t("markdownHint")} rows={10} maxLength={6000} defaultValue={site.about.body} />
+      </>)}
+
       {section("contacts", <>
         {Array.from({ length: CONTACT_ROWS }, (_, i) => {
           const c = site.contacts.items[i];

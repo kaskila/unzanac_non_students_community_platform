@@ -353,14 +353,33 @@ model MaterialFile {
   purgedAt     DateTime? @db.Timestamptz(3) // stored object deleted
 }
 
+enum UploadKind {
+  MATERIAL // a Resources file; targetId = Material.id
+  HERO // a home page photo; targetId = HeroSlide.id
+}
+
 // Pending direct uploads: the presigned URL was issued but the upload isn't confirmed yet.
 model PendingUpload {
-  id          String   @id @default(cuid())
-  storageKey  String   @unique
-  materialId  String
+  id          String     @id @default(cuid())
+  kind        UploadKind @default(MATERIAL)
+  storageKey  String     @unique
+  targetId    String     @map("materialId")
   fileName    String
   sizeBytes   Int
   createdById String
-  expiresAt   DateTime @db.Timestamptz(3)
+  expiresAt   DateTime   @db.Timestamptz(3)
+  createdAt   DateTime   @default(now()) @db.Timestamptz(3)
+}
+
+// ── Home page photos (landing redesign) ──
+
+model HeroSlide {
+  id          String   @id @default(cuid())
+  alt         String // describes the photo for screen readers; required
+  sortOrder   Int      @default(0)
+  active      Boolean  @default(true)
+  version     String? // set once resized variants exist: hero/<id>/<version>-<width>.webp
+  createdById String
   createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
 }

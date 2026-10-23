@@ -7,12 +7,17 @@
     "emblemAlt": "New Apostolic Church emblem",
     "nav": {
       "label": "Main menu",
-      "announcements": "Announcements",
-      "events": "Events",
+      "menu": "Menu",
+      "home": "Home",
       "committees": "Committees",
-      "visit": "Plan a visit",
-      "watch": "Watch",
-      "resources": "Resources"
+      "announcements": "Announcements",
+      "activities": "Activities",
+      "media": "Media",
+      "about": "About",
+      "churchFinder": "Church finder",
+      "contact": "Contact",
+      "search": "Search",
+      "searchPlaceholder": "Search term"
     }
   },
   "Home": {
@@ -42,7 +47,11 @@
     "watchLive": "Watch the livestream",
     "moreVideos": "More videos",
     "resourcesTitle": "Resources",
-    "allResources": "All resources"
+    "allResources": "All resources",
+    "photos": "Photos from the congregation",
+    "previousPhoto": "Previous photo",
+    "nextPhoto": "Next photo",
+    "photoOf": "Photo {n} of {count}"
   },
   "Footer": {
     "follow": "Follow us",
@@ -72,7 +81,8 @@
       "committees": "Committees",
       "content": "Site content",
       "media": "Media",
-      "resources": "Resources"
+      "resources": "Resources",
+      "homePhotos": "Home photos"
     },
     "login": {
       "title": "Admin sign in",
@@ -239,7 +249,10 @@
         "file_empty": "This file is empty.",
         "upload_expired": "The upload took too long. Please try again.",
         "upload_missing": "The file didn't arrive. Please try again.",
-        "upload_failed": "The upload failed. Check your connection and try again."
+        "upload_failed": "The upload failed. Check your connection and try again.",
+        "alt_required": "Describe the photo first (it is read out to blind visitors).",
+        "photo_type": "Use a JPG, PNG or WebP photo.",
+        "photo_unreadable": "This photo couldn't be read. Try exporting it again as JPG."
       }
     },
     "announcements": {
@@ -442,6 +455,11 @@
         "body": "Notice",
         "publish": "Publish new version",
         "published": "Published."
+      },
+      "about": {
+        "title": "\"About us\" page",
+        "intro": "Who the congregation is. Shown under About in the main menu.",
+        "body": "Text"
       }
     },
     "media": {
@@ -554,6 +572,31 @@
         "checking": "Checking the file…",
         "done": "Uploaded."
       }
+    },
+    "homePhotos": {
+      "title": "Home photos",
+      "intro": "Photos for the slider at the top of the home page. They are resized for phones automatically, and location data from the camera is removed. Visitors download only the first photo unless they swipe.",
+      "addTitle": "Add a photo",
+      "listTitle": "Photos",
+      "empty": "No photos yet. Without photos, the home page shows the Azure welcome band.",
+      "hidden": "Hidden",
+      "alt": "Description",
+      "order": "Order",
+      "orderHint": "Lower numbers show first.",
+      "active": "Show on the home page",
+      "save": "Save",
+      "delete": "Delete photo",
+      "upload": {
+        "alt": "Description",
+        "altHint": "What the photo shows, e.g. \"Members of the congregation after the youth service\". Read out to blind visitors.",
+        "file": "Photo",
+        "fileHint": "JPG, PNG or WebP up to 10 MB. Wide photos work best; the slider crops to a banner shape.",
+        "submit": "Upload photo",
+        "uploading": "Uploading… {percent}%",
+        "progress": "Upload progress",
+        "checking": "Resizing the photo…",
+        "done": "Photo added."
+      }
     }
   },
   "Content": {
@@ -601,10 +644,10 @@
     "back": "All announcements"
   },
   "Events": {
-    "title": "Events",
-    "intro": "Services and events for the next two months.",
-    "empty": "No events are planned yet.",
-    "back": "All events",
+    "title": "Activities",
+    "intro": "Divine services, meetings and events for the next two months.",
+    "empty": "No activities are planned yet.",
+    "back": "All activities",
     "scheduleTitle": "Regular schedule",
     "when": "When",
     "nextDates": "Next dates",
@@ -651,7 +694,8 @@
     "titlesOnly": "Show titles only (uses less data)",
     "showThumbnails": "Show pictures",
     "channel": "Our YouTube channel",
-    "facebookPage": "Our Facebook page"
+    "facebookPage": "Our Facebook page",
+    "resourcesLink": "Looking for hymn sheets, notices or practice audio? See Resources."
   },
   "Resources": {
     "title": "Resources",
@@ -666,5 +710,30 @@
     "type": "File",
     "updatedLabel": "Updated",
     "download": "Download ({size})"
+  },
+  "About": {
+    "title": "About us"
+  },
+  "Contact": {
+    "title": "Contact",
+    "intro": "Questions about services, membership or committees? Get in touch.",
+    "noContacts": "Contact details will be published here soon.",
+    "whereTitle": "Where to find us",
+    "directions": "Directions",
+    "planVisit": "Plan your visit",
+    "followTitle": "Follow us"
+  },
+  "Search": {
+    "title": "Search",
+    "loading": "Searching…",
+    "empty": "Type a word in the search box above, for example \"choir\" or \"youth\".",
+    "count": "{count, plural, =0 {Nothing found for \"{query}\".} one {# result for \"{query}\"} other {# results for \"{query}\"}}",
+    "groups": {
+      "announcements": "Announcements",
+      "activities": "Activities",
+      "committees": "Committees",
+      "videos": "Videos",
+      "resources": "Resources"
+    }
   }
 }

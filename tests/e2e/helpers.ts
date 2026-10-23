@@ -73,3 +73,15 @@ export async function enrolTwoFactor(page: Page, password: string): Promise<stri
 export function alertMessage(page: Page) {
   return page.locator('[role="alert"]:not(#__next-route-announcer__)');
 }
+
+/**
+ * Open a public page until it shows an admin's latest change. Spec files run in parallel against
+ * one server, so a render of "/" that started just before a save can land just after it
+ * (known issue in docs/STATUS.md); reloading gets the fresh render.
+ */
+export async function gotoFresh(page: Page, path: string, check: () => Promise<unknown>) {
+  await expect(async () => {
+    await page.goto(path);
+    await check();
+  }).toPass({ timeout: 20_000 });
+}

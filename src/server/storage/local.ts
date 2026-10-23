@@ -1,8 +1,9 @@
 import "server-only";
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { createReadStream } from "node:fs";
-import { mkdir, open, rm, stat } from "node:fs/promises";
+import { mkdir, open, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { Readable } from "node:stream";
 import { DOWNLOAD_URL_SECONDS, UPLOAD_URL_SECONDS, type StorageDriver } from "@/server/storage";
 
 // Development stand-in for R2: files live in .storage/ and presigned URLs point at
@@ -91,6 +92,22 @@ export function localStorageDriver(): StorageDriver {
 
     async remove(key) {
       await rm(/*turbopackIgnore: true*/ localPath(key), { force: true });
+    },
+
+    async read(key) {
+      return new Uint8Array(await readFile(/*turbopackIgnore: true*/ localPath(key)));
+    },
+
+    async put(key, body) {
+      const file = localPath(key);
+      await ensureParentDir(file);
+      await writeFile(/*turbopackIgnore: true*/ file, body);
+    },
+
+    async stream(key) {
+      const file = localPath(key);
+      if (!(await stat(/*turbopackIgnore: true*/ file).catch(() => null))) return null;
+      return Readable.toWeb(createReadStream(/*turbopackIgnore: true*/ file)) as ReadableStream<Uint8Array>;
     },
   };
 }

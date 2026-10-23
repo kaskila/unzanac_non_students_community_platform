@@ -294,6 +294,21 @@ export async function getPublicMaterial(slug: string) {
   return prisma.material.findFirst({ where: { slug, ...availableMaterialWhere(new Date()) }, select: materialSelect });
 }
 
+// ── Home page photos ──
+
+export async function getHeroSlides() {
+  "use cache";
+  cacheLife("public");
+  cacheTag(TAGS.hero);
+  const slides = await prisma.heroSlide.findMany({
+    where: { active: true, version: { not: null } },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    take: 8,
+    select: { id: true, alt: true, version: true },
+  });
+  return slides.map((s) => ({ id: s.id, alt: s.alt, version: s.version! }));
+}
+
 /** Slugs to prerender at build time (generateStaticParams). */
 export async function getPublishedSlugs(kind: "announcements" | "events" | "committees") {
   "use cache";

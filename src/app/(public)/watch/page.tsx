@@ -18,6 +18,9 @@ export default async function WatchPage({ searchParams }: Props) {
   return (
     <div className={pub.container}>
       <PageHeader title={t("title")} intro={t("intro")} />
+      <p className="mb-6">
+        <NavLink href="/resources">{t("resourcesLink")}</NavLink>
+      </p>
       <Suspense fallback={<p>{t("loading")}</p>}>
         <VideoList searchParams={searchParams} />
       </Suspense>

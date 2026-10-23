@@ -1,7 +1,7 @@
 # Project status
 
 **Updated:** 13 Oct 2026
-**Current branch:** `m2b-media` (built on `m2-content`)
+**Current branch:** `landing-redesign` (built on `m2b-media`)
 
 ## Done
 
@@ -30,6 +30,12 @@
 - **Public:** `/watch` (by category; "titles only" mode), `/watch/[slug]` with tap-to-play `youtube-nocookie.com` player and "Watch in the YouTube app"; Facebook videos are link cards. Home shows the featured video and a "Live now" banner while an event with a livestream link is running.
 - **Resources:** create → upload straight to storage with a progress bar → server checks size and real type (first bytes, `file-type`) → publish. Replace keeps the link, versions are listed, downloads are counted. Public `/resources` (by category, search), `/resources/[slug]` ("PDF · 1.2 MB"), `/resources/[slug]/download` (count + 5-minute signed link). Unlisted items are link-only. Owners can delete; files are purged 30 days later by the daily job.
 - **Storage drivers** (`src/server/storage`): `r2` for staging/production, `local` (`.storage/` + `/api/dev-storage`) for development and E2E, refused in production unless `ALLOW_LOCAL_STORAGE=1`.
+
+### Landing redesign (from the congregation's mockup)
+- Grey page with a white header card (emblem, name, **Church finder** → visit page directions, **Contact** → `/contact`) and an Azure menu bar: Home, Committees, Announcements, Activities (`/events`), Media (`/watch`), About (`/about`), plus a search box (`/search`, across announcements, activities, committees, videos, resources). On phones the menu folds into "Menu".
+- Menu text is 19px bold so white on Azure passes WCAG as large text (3.27:1).
+- **Home photos** (Admin → Home photos): uploaded with a required description, checked to be JPG/PNG/WebP, resized to 480/960/1440px WebP banners (camera location data removed), served from `/images/hero/…` with year-long caching. The slider loads only the first photo; others load when the visitor swipes or taps an arrow.
+- New editable "About us" text under Site content.
 
 ## Decisions made
 
@@ -60,6 +66,8 @@
 - The existing member register (needed before M3).
 
 ## Known issues
+
+- **Stale public page after a save, under concurrent traffic:** if a cached page (e.g. the home page) is being re-rendered at the moment an admin saves, that render can finish after `updateTag()` and keep the old content until the next 5-minute refresh. Seen only when E2E specs load "/" in parallel; tests use `gotoFresh()`. Fix to investigate: a second `revalidateTag` shortly after the save, or a shorter cache life for the home page.
 
 - `npm audit` flags high-severity issues in Prisma CLI's bundled MySQL driver and ESLint dependencies. They aren't in the app's runtime; Dependabot will pick up the fixes.
 - `experimental.authInterrupts` (for 403 pages) is still experimental in Next.js 16. Recheck on upgrades.
