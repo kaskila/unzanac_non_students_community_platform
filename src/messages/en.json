@@ -51,7 +51,9 @@
     "photos": "Photos from the congregation",
     "previousPhoto": "Previous photo",
     "nextPhoto": "Next photo",
-    "photoOf": "Photo {n} of {count}"
+    "photoOf": "Photo {n} of {count}",
+    "pausePhotos": "Pause the slideshow",
+    "playPhotos": "Play the slideshow"
   },
   "Footer": {
     "follow": "Follow us",

@@ -64,7 +64,14 @@ export default async function HomePage() {
       {heroSlides.length > 0 && (
         <HeroCarousel
           slides={heroSlides}
-          labels={{ region: t("photos"), previous: t("previousPhoto"), next: t("nextPhoto"), slide: t("photoOf", { n: "{n}", count: "{count}" }) }}
+          labels={{
+            region: t("photos"),
+            previous: t("previousPhoto"),
+            next: t("nextPhoto"),
+            slide: t("photoOf", { n: "{n}", count: "{count}" }),
+            pause: t("pausePhotos"),
+            play: t("playPhotos"),
+          }}
         />
       )}
       {/* With photos the welcome sits on white below them; without, on the Azure band. */}

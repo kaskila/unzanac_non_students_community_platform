@@ -64,3 +64,36 @@ async function measureTransfer(page: Page, navigate: () => Promise<unknown>) {
   await cdp.detach();
   return { total, critical };
 }
+
+test("home photos change every few seconds, load one ahead, and can be paused", async ({ page }) => {
+  await page.clock.install();
+  await page.goto("/");
+  const slider = page.getByRole("region", { name: "Photos from the congregation" });
+  const photos = slider.getByRole("img");
+  await expect(photos).toHaveCount(1); // only the first photo comes with the page
+
+  // Shortly before the 6-second mark the next photo is fetched, then it slides in.
+  await page.clock.runFor(5_000);
+  await expect(photos).toHaveCount(2);
+  await page.clock.runFor(1_500);
+  await expect(slider.getByRole("group", { name: "Photo 2 of 4" })).toBeInViewport({ ratio: 0.9 });
+
+  // Pausing stops the slideshow (WCAG 2.2.2) and no further photos are downloaded.
+  await slider.getByRole("button", { name: "Pause the slideshow" }).click();
+  await expect(slider.getByRole("button", { name: "Play the slideshow" })).toBeVisible();
+  await page.mouse.move(0, 0); // leave the slider, which on its own only pauses while hovered
+  await page.clock.runFor(20_000);
+  await expect(photos).toHaveCount(2);
+});
+
+test("visitors who ask for less motion get no slideshow", async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 360, height: 740 } });
+  const page = await context.newPage();
+  await page.clock.install();
+  await page.goto("/");
+  const slider = page.getByRole("region", { name: "Photos from the congregation" });
+  await expect(slider.getByRole("button", { name: "Play the slideshow" })).toBeVisible();
+  await page.clock.runFor(20_000);
+  await expect(slider.getByRole("img")).toHaveCount(1);
+  await context.close();
+});
