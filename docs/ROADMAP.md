@@ -29,7 +29,7 @@ A phase starts only when the previous one is **live and being used**. Each gate 
 5. The admin guide and README are up to date.
 
 ### Work that happens in every phase
-- Brand palette, accessibility (WCAG 2.2 AA) and the 150 KB home page budget are checked automatically in CI.
+- Brand palette, accessibility (WCAG 2.2 AA) and the home page byte budget (critical path ≤ 50 KB, first visit ≤ 200 KB, repeat visit ≤ 20 KB (ADR 0002)) are checked automatically in CI.
 - Permission rules are tested for every new role and action.
 - Every new type of personal data gets a stated purpose and a privacy notice update before it's collected.
 - A backup restore drill once a quarter.
@@ -61,7 +61,7 @@ A phase starts only when the previous one is **live and being used**. Each gate 
 
 | # | Milestone | Weeks | Main deliverables |
 |---|---|---|---|
-| M0 | Foundation | 1 | Repo, Next.js 16 + Tailwind (brand tokens) + Prisma 7, CI with every quality check, staging, 150 KB budget measured |
+| M0 | Foundation | 1 | Repo, Next.js 16 + Tailwind (brand tokens) + Prisma 7, CI with every quality check, staging, byte budget measured and decided (ADR 0002) |
 | M1 | Admin access | 1 | Admin login + required 2FA, invites, roles, permission module, audit log |
 | M2 | Content + public site | 2 | Site content, committees, announcements, events (recurring, .ics), all public pages |
 | M2b | Media + resources | 1 | YouTube (tap-to-play, channel import), Facebook links, R2 uploads and downloads |
@@ -75,7 +75,7 @@ A phase starts only when the previous one is **live and being used**. Each gate 
 - Live in production; the real register imported and cleaned.
 - First update campaign sent to all members, with **≥ 50 % responses** within 4 weeks.
 - Announcements or events posted at least weekly for 4 weeks in a row.
-- Home page ≤ 150 KB and WCAG 2.2 AA checks green.
+- Home page within its byte budget (critical path ≤ 50 KB, first visit ≤ 200 KB, repeat visit ≤ 20 KB (ADR 0002)) and WCAG 2.2 AA checks green.
 - Pilot survey done.
 
 Full specification: [PLAN.md](PLAN.md).

@@ -1,0 +1,385 @@
+// UNZANAC platform schema. Full target model: docs/PLAN.md §7.
+// Models are added milestone by milestone; M0 starts with committees.
+// Convention: every DateTime is stored as timestamptz (UTC) and shown in Africa/Lusaka.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Committee {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  description  String?
+  meetingInfo  String?
+  contactName  String?
+  contactPhone String? // E.164
+  sortOrder    Int      @default(0)
+  isPublic     Boolean  @default(true)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  announcements Announcement[]
+  events        Event[]
+  videos        Video[]
+  materials     Material[]
+}
+
+// ── Content (M2) ──
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AnnouncementCategory {
+  GENERAL
+  SERVICES
+  YOUTH
+  SUNDAY_SCHOOL
+  MUSIC
+  CONDOLENCES
+}
+
+model Announcement {
+  id          String               @id @default(cuid())
+  slug        String               @unique
+  title       String
+  body        String // limited Markdown (src/lib/markdown.ts)
+  category    AnnouncementCategory @default(GENERAL)
+  committeeId String?
+  committee   Committee?           @relation(fields: [committeeId], references: [id], onDelete: SetNull)
+  pinned      Boolean              @default(false)
+  status      ContentStatus        @default(DRAFT)
+  publishAt   DateTime?            @db.Timestamptz(3) // set on publish; a future value means scheduled
+  expiresAt   DateTime?            @db.Timestamptz(3)
+  authorId    String
+  createdAt   DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime             @updatedAt @db.Timestamptz(3)
+
+  @@index([status, publishAt])
+}
+
+model Event {
+  id             String           @id @default(cuid())
+  slug           String           @unique
+  title          String
+  details        String? // limited Markdown
+  venue          String
+  mapUrl         String?
+  audience       String? // "Everyone", "Youth", ...
+  startsAt       DateTime         @db.Timestamptz(3) // first occurrence
+  endsAt         DateTime         @db.Timestamptz(3)
+  rrule          String? // RFC 5545 subset (src/lib/recurrence.ts); null = one-off
+  isService      Boolean          @default(false) // a divine service: feeds the "Next service" card
+  livestreamUrl  String? // shows a "Live now" banner while an occurrence is running
+  showInSchedule Boolean          @default(false)
+  committeeId    String?
+  committee      Committee?       @relation(fields: [committeeId], references: [id], onDelete: SetNull)
+  status         ContentStatus    @default(DRAFT)
+  createdById    String
+  createdAt      DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime         @updatedAt @db.Timestamptz(3)
+  exceptions     EventException[]
+  videos         Video[]
+
+  @@index([status, startsAt])
+}
+
+model EventException {
+  id              String    @id @default(cuid())
+  eventId         String
+  event           Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  occurrenceStart DateTime  @db.Timestamptz(3) // the original start of the date being changed
+  cancelled       Boolean   @default(false)
+  newStart        DateTime? @db.Timestamptz(3)
+  newEnd          DateTime? @db.Timestamptz(3)
+  note            String?
+
+  @@unique([eventId, occurrenceStart])
+}
+
+model SiteContent {
+  key         String   @id // hero, visit, contacts, social, verse, location
+  value       Json
+  updatedById String?
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model PrivacyNotice {
+  version       Int      @id
+  body          String // limited Markdown
+  publishedAt   DateTime @default(now()) @db.Timestamptz(3)
+  publishedById String?
+}
+
+// ── Admin access (M1) ──
+
+enum AdminInvitePurpose {
+  INVITE // new admin account
+  RESET // replace password and re-enrol 2FA for an existing admin
+}
+
+model AdminInvite {
+  id          String             @id @default(cuid())
+  tokenHash   String             @unique // sha256 of the token in the link; the token itself is never stored
+  purpose     AdminInvitePurpose @default(INVITE)
+  email       String
+  name        String?
+  role        String // owner | register_officer | editor
+  userId      String? // set for RESET
+  createdById String?
+  expiresAt   DateTime           @db.Timestamptz(3)
+  usedAt      DateTime?          @db.Timestamptz(3)
+  revokedAt   DateTime?          @db.Timestamptz(3)
+  createdAt   DateTime           @default(now()) @db.Timestamptz(3)
+
+  @@index([email])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String? // null = public visitor or system
+  action     String // "admin.invite", "auth.sign_in", ...
+  entityType String
+  entityId   String?
+  meta       Json?
+  ipHash     String?
+  at         DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([at])
+}
+
+// ── Better Auth tables (generated by `npx auth generate`; keep the @db.Timestamptz convention when regenerating) ──
+
+model User {
+  id               String      @id
+  name             String
+  email            String
+  emailVerified    Boolean     @default(false)
+  image            String?
+  createdAt        DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime    @updatedAt @db.Timestamptz(3)
+  twoFactorEnabled Boolean?    @default(false)
+  role             String?
+  banned           Boolean?    @default(false)
+  banReason        String?
+  banExpires       DateTime?   @db.Timestamptz(3)
+  sessions         Session[]
+  accounts         Account[]
+  twofactors       TwoFactor[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime @db.Timestamptz(3)
+  token          String
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @db.Timestamptz(3)
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model TwoFactor {
+  id                      String    @id
+  secret                  String
+  backupCodes             String
+  userId                  String
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verified                Boolean?  @default(true)
+  failedVerificationCount Int?      @default(0)
+  lockedUntil             DateTime? @db.Timestamptz(3)
+
+  @@index([secret])
+  @@index([userId])
+  @@map("twoFactor")
+}
+
+model RateLimit {
+  id          String @id
+  key         String
+  count       Int
+  lastRequest BigInt
+
+  @@unique([key])
+  @@map("rateLimit")
+}
+
+// ── Media and resources (M2b) ──
+
+enum VideoSource {
+  YOUTUBE
+  FACEBOOK
+}
+
+enum VideoKind {
+  VIDEO
+  LIVE
+  PLAYLIST
+}
+
+enum VideoCategory {
+  DIVINE_SERVICES
+  CHOIR_MUSIC
+  YOUTH
+  SPECIAL_EVENTS
+  TEACHING
+}
+
+model Video {
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  source       VideoSource   @default(YOUTUBE)
+  externalId   String // YouTube video or playlist id; for Facebook, the video URL
+  kind         VideoKind     @default(VIDEO)
+  title        String
+  description  String?
+  category     VideoCategory @default(CHOIR_MUSIC)
+  thumbnailUrl String?
+  recordedAt   DateTime?     @db.Timestamptz(3)
+  featured     Boolean       @default(false) // at most one at a time (enforced in the service)
+  status       ContentStatus @default(DRAFT) // channel imports arrive as DRAFT
+  eventId      String?
+  event        Event?        @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  committeeId  String?
+  committee    Committee?    @relation(fields: [committeeId], references: [id], onDelete: SetNull)
+  importedAt   DateTime?     @db.Timestamptz(3) // set when it came from the channel feed
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime      @updatedAt @db.Timestamptz(3)
+
+  @@unique([source, externalId])
+  @@index([status, recordedAt])
+}
+
+enum MaterialCategory {
+  DIVINE_SERVICE_HYMNS
+  SUNDAY_SCHOOL
+  CONFIRMATION
+  YOUTH
+  CHOIR_MUSIC
+  NOTICES_FORMS
+}
+
+enum MaterialVisibility {
+  PUBLIC
+  UNLISTED // reachable by link only; MEMBERS arrives in Phase 2
+}
+
+model Material {
+  id            String             @id @default(cuid())
+  slug          String             @unique
+  title         String
+  description   String?
+  category      MaterialCategory
+  committeeId   String?
+  committee     Committee?         @relation(fields: [committeeId], references: [id], onDelete: SetNull)
+  visibility    MaterialVisibility @default(PUBLIC)
+  status        ContentStatus      @default(DRAFT)
+  currentFileId String?            @unique
+  currentFile   MaterialFile?      @relation("CurrentFile", fields: [currentFileId], references: [id], onDelete: SetNull)
+  downloadCount Int                @default(0)
+  expiresAt     DateTime?          @db.Timestamptz(3)
+  deletedAt     DateTime?          @db.Timestamptz(3) // soft delete; stored files are purged 30 days later
+  createdById   String
+  createdAt     DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime           @updatedAt @db.Timestamptz(3)
+  files         MaterialFile[]     @relation("Versions")
+
+  @@index([status, category])
+}
+
+model MaterialFile {
+  id           String    @id @default(cuid())
+  materialId   String
+  material     Material  @relation("Versions", fields: [materialId], references: [id], onDelete: Cascade)
+  currentOf    Material? @relation("CurrentFile")
+  storageKey   String    @unique // materials/<materialId>/<cuid>.<ext>
+  fileName     String // original name, sanitised
+  mimeType     String // detected from the file's content
+  sizeBytes    Int
+  sha256       String
+  uploadedById String
+  uploadedAt   DateTime  @default(now()) @db.Timestamptz(3)
+  purgedAt     DateTime? @db.Timestamptz(3) // stored object deleted
+}
+
+enum UploadKind {
+  MATERIAL // a Resources file; targetId = Material.id
+  HERO // a home page photo; targetId = HeroSlide.id
+}
+
+// Pending direct uploads: the presigned URL was issued but the upload isn't confirmed yet.
+model PendingUpload {
+  id          String     @id @default(cuid())
+  kind        UploadKind @default(MATERIAL)
+  storageKey  String     @unique
+  targetId    String     @map("materialId")
+  fileName    String
+  sizeBytes   Int
+  createdById String
+  expiresAt   DateTime   @db.Timestamptz(3)
+  createdAt   DateTime   @default(now()) @db.Timestamptz(3)
+}
+
+// ── Home page photos (landing redesign) ──
+
+model HeroSlide {
+  id          String   @id @default(cuid())
+  alt         String // describes the photo for screen readers; required
+  sortOrder   Int      @default(0)
+  active      Boolean  @default(true)
+  version     String? // set once resized variants exist: hero/<id>/<version>-<width>.webp
+  createdById String
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+}

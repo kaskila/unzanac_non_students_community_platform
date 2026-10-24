@@ -27,7 +27,7 @@
 
 ### Success criteria
 
-- The home page loads in under 3 seconds on throttled 3G and transfers under 150 KB.
+- The home page loads in under 3 seconds on throttled 3G and meets its byte budget: critical path ≤ 50 KB, first visit ≤ 200 KB, repeat visit ≤ 20 KB (ADR 0002).
 - Admins can publish an announcement or event from a phone in under a minute.
 - The existing register can be imported and duplicates cleaned up.
 - An update campaign reaches every member through WhatsApp links and is tracked in one screen.
@@ -397,6 +397,7 @@ model Event {
   startsAt       DateTime
   endsAt         DateTime
   rrule          String?                  // RFC 5545, null = one-off
+  isService      Boolean  @default(false) // divine service: feeds the "next service card"
   showInSchedule Boolean  @default(false)
   committeeId        String?
   status         ContentStatus @default(DRAFT)
@@ -672,7 +673,7 @@ model AuditLog {
 - Public forms are protected by honeypot, IP rate limits and Turnstile.
 - No personal data in logs. Sentry strips request bodies and cookies.
 - Uploads: file types checked against an allow-list using the file's content; HTML, SVG and executables are rejected; files are always served as downloads from R2, never from the site's own domain; the bucket is private and access goes through short-lived signed URLs.
-- Content-Security-Policy allows only `youtube-nocookie.com` in frames, `i.ytimg.com` for images, and the R2 host as a redirect target.
+- Content-Security-Policy allows only `youtube-nocookie.com` and `www.google.com` (the Church finder map) in frames, `i.ytimg.com` for images, and the R2 host as a redirect target.
 - Dependabot and GitHub secret scanning are on. `npm audit` runs in CI.
 - Secrets live only in the host's environment variables, and `.env.example` documents them.
 
@@ -692,7 +693,7 @@ model AuditLog {
 
 | Area | Target | How it's enforced |
 |---|---|---|
-| Performance | Home ≤150 KB transferred, LCP < 2.5 s on Slow 4G, CLS < 0.1 | Lighthouse CI budgets fail the build |
+| Performance | Home page critical path ≤ 50 KB, first visit ≤ 200 KB, repeat visit ≤ 20 KB (ADR 0002); LCP < 2.5 s on Slow 4G, CLS < 0.1 | Lighthouse CI budgets fail the build |
 | Accessibility | WCAG 2.2 AA | `@axe-core/playwright` on every public page and form, plus a manual TalkBack pass before launch |
 | Layout | Usable at 360 px, tap targets ≥ 44 px | Playwright runs at 360×740 |
 | Types and lint | `strict`, no `any`, ESLint | CI |
@@ -710,7 +711,7 @@ model AuditLog {
 7. Editor pastes a YouTube link → title and thumbnail filled in → publish → the Watch page loads **no YouTube script** until play is tapped.
 8. Editor uploads a PDF → it appears in Resources with type and size → a visitor downloads it → the count increases; an unlisted item is missing from lists but opens by its link; an `.html` upload is rejected.
 
-**Risk to watch:** the Next.js App Router ships roughly 90–100 KB of framework JavaScript on its own. The 150 KB budget leaves little room. M0 measures it on an empty page; if it doesn't fit, we decide then (raise the budget, or serve the home page without hydration).
+**Byte budget:** the Next.js App Router ships about 140 KB (gzip) of framework JavaScript on every first visit, more than the 90–100 KB first estimated. M0 measured it, and [ADR 0002](decisions/0002-home-page-budget.md) replaced the single 150 KB limit with a split budget: critical path ≤ 50 KB, first visit ≤ 200 KB, repeat visit ≤ 20 KB (ADR 0002).
 
 ---
 
@@ -718,11 +719,11 @@ model AuditLog {
 
 | Environment | Purpose | Database |
 |---|---|---|
-| Local | Development | Postgres in Docker, seeded |
-| Staging | Testing on real phones, demos | Managed Postgres (staging) |
-| Production | Live | Managed Postgres (production) with point-in-time recovery |
+| Local | Development | PostgreSQL 17 on the developer's PC (Docker optional), seeded |
+| Staging | Testing on real phones, demos | Neon (staging branch or project) |
+| Production | Live | Neon (production) with point-in-time recovery |
 
-- **Hosting (recommended to start):** Vercel for the app, with server functions in the **same region as the database**, plus a managed Postgres provider in the nearest region available (Cape Town if offered, otherwise Frankfurt or London). Cached public pages are served from African edge locations, so the database distance mainly affects admin pages and form submissions.
+- **Hosting (recommended to start):** Vercel for the app, with server functions in the **same region as the database**, plus **Neon** Postgres in the nearest region Neon offers. The app connects through Neon's **pooled** URL (`DATABASE_URL`); migrations use the **direct** URL (`DIRECT_URL`). Cached public pages are served from African edge locations, so the database distance mainly affects admin pages and form submissions.
 - **CI/CD (GitHub Actions):** install → lint → typecheck → unit tests → build → e2e + axe → Lighthouse. Main is protected and needs green CI; merging deploys to staging; a tagged release promotes to production.
 - **Migrations:** `prisma migrate deploy` runs on deploy. Data-changing migrations need a written rollback note.
 - **Cron (daily):** delete expired tokens and old spam, close campaigns, apply retention rules, import new YouTube uploads as drafts, purge soft-deleted R2 objects older than 30 days.
@@ -739,7 +740,7 @@ Estimates assume one developer working about 20–25 hours a week. Each mileston
 
 | # | Milestone | Weeks | Deliverables | Exit criteria |
 |---|---|---|---|---|
-| **M0** | Foundation | 1 | Repo, Next 16 + Tailwind + Prisma 7 + next-intl, Docker Postgres, seed, CI pipeline with every check, Sentry, staging deploy, ADR-001 (stack) | Push to main → green CI → staging; empty home page within budget (or budget decision recorded) |
+| **M0** | Foundation | 1 | Repo, Next 16 + Tailwind + Prisma 7 + next-intl, local Postgres (Docker optional), seed, CI pipeline with every check, Sentry, staging deploy, ADR-001 (stack) | Push to main → green CI → staging; empty home page within budget (or budget decision recorded) |
 | **M1** | Admin access | 1 | Better Auth email + password + required TOTP, invite links, roles, `policy.ts` + matrix tests, admin layout, admin users screen, audit log | Owner invites an Editor; Editor is blocked from register routes (tested) |
 | **M2** | Content + public site | 2 | Site content, committees, announcements (schedule, pin, expiry, share text), events (rrule, exceptions, .ics), all public pages, caching + revalidation, privacy notice | Journeys 1 & 2 pass; Lighthouse and axe green |
 | **M2b** | Media + resources | 1 | Video model, YouTube link parsing + oEmbed, tap-to-play player, Watch pages, channel RSS import to drafts, Facebook link cards, R2 setup, direct uploads, file checks, Resources pages, signed downloads, versions, counts, live banner | Journeys 7 & 8 pass; home page still within budget with the featured video |
@@ -767,7 +768,7 @@ Estimates assume one developer working about 20–25 hours a week. Each mileston
 | Risk | Impact | Mitigation |
 |---|---|---|
 | The official NAC register format differs from our fields | Rework | Single field definition list (`member-fields.ts`); get the format before M3 |
-| The 150 KB budget can't be met with App Router | Slower first load | Measured in M0, decision recorded early |
+| Framework JavaScript grows with Next.js upgrades | Heavier first visit | First-visit and critical-path budgets fail CI; reviewed on each Next.js upgrade (ADR 0002) |
 | An update link is forwarded to someone else | Exposure of one member's data | Year-of-birth check, partly hidden phones, 14-day expiry, revocation, logged opens |
 | Spam on the join form | A cluttered queue | Honeypot, rate limit, Turnstile, "mark as spam" |
 | The register leaks through an export | Serious privacy breach | Owner-only, logged, sensitive columns opt-in, 2FA |

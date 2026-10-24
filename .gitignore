@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# allow the documented example env file
+!.env.example
+
+# test output
+/test-results/
+/playwright-report/
+/.lighthouseci/
+
+# local file storage (src/server/storage/local.ts)
+/.storage/
