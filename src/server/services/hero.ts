@@ -3,7 +3,7 @@ import { fileTypeFromBuffer } from "file-type";
 import sharp from "sharp";
 import { z } from "zod";
 import { checkFile } from "@/lib/file-rules";
-import { HERO_ASPECT, HERO_QUALITY, HERO_WIDTHS, heroImageKey } from "@/lib/hero";
+import { HERO_ASPECT, HERO_AVIF_QUALITY, HERO_QUALITY, HERO_WIDTHS, heroImageKey } from "@/lib/hero";
 import { audit } from "@/server/audit";
 import { prisma } from "@/server/db";
 import { ServiceError } from "@/server/errors";
@@ -13,7 +13,7 @@ import { storage, UPLOAD_URL_SECONDS } from "@/server/storage";
 
 // Home page photos (the slider under the menu). Admins upload one photo; the server checks it is
 // really a JPG, PNG or WebP, then stores small WebP copies cropped to the banner shape, so a phone
-// downloads ~30 KB instead of a multi-megabyte camera file. Re-encoding also drops EXIF data
+// downloads ~20 KB (AVIF, or WebP on older phones) instead of a multi-megabyte camera file. Re-encoding also drops EXIF data
 // (such as GPS location). The original upload is deleted.
 
 const PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -79,12 +79,14 @@ export async function finishSlideUpload(actor: Actor, uploadId: string) {
   const version = randomBytes(6).toString("base64url").replace(/[^A-Za-z0-9]/g, "x");
   try {
     for (const width of HERO_WIDTHS) {
-      const webp = await sharp(original)
-        .rotate() // respect the phone's orientation flag before it is dropped
-        .resize({ width, height: Math.round(width * HERO_ASPECT), fit: "cover", position: "attention" })
-        .webp({ quality: HERO_QUALITY })
-        .toBuffer();
-      await store.put(heroImageKey(pending.targetId, version, width), new Uint8Array(webp), "image/webp");
+      const banner = () =>
+        sharp(original)
+          .rotate() // respect the phone's orientation flag before it is dropped
+          .resize({ width, height: Math.round(width * HERO_ASPECT), fit: "cover", position: "attention" });
+      const webp = await banner().webp({ quality: HERO_QUALITY }).toBuffer();
+      const avif = await banner().avif({ quality: HERO_AVIF_QUALITY, effort: 4 }).toBuffer();
+      await store.put(heroImageKey(pending.targetId, version, width, "webp"), new Uint8Array(webp), "image/webp");
+      await store.put(heroImageKey(pending.targetId, version, width, "avif"), new Uint8Array(avif), "image/avif");
     }
   } catch {
     return fail("photo_unreadable");
@@ -116,7 +118,9 @@ export async function deleteSlide(actor: Actor, id: string) {
   const slide = await prisma.heroSlide.findUnique({ where: { id } });
   if (!slide) return;
   if (slide.version) {
-    for (const width of HERO_WIDTHS) await storage().remove(heroImageKey(slide.id, slide.version, width));
+    for (const width of HERO_WIDTHS) {
+      for (const format of ["webp", "avif"] as const) await storage().remove(heroImageKey(slide.id, slide.version, width, format));
+    }
   }
   await prisma.heroSlide.delete({ where: { id } });
   await audit({ actorId: actor.id, action: "hero.delete", entityType: "heroSlide", entityId: id });

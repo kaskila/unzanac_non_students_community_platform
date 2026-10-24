@@ -1,22 +1,25 @@
-// Home page photo sizes. The browser picks one with srcset: ~480px wide on most phones.
-export const HERO_WIDTHS = [480, 960, 1440] as const;
+// Home page photo sizes. The browser picks one with srcset: 720px on a typical 2× phone (360px
+// wide), 480px on 1× screens; 960/1440 for tablets and desktops.
+export const HERO_WIDTHS = [480, 720, 960, 1440] as const;
 /** Banner shape (height / width), like the mockup. */
 export const HERO_ASPECT = 7 / 16;
-export const HERO_QUALITY = 55;
+export const HERO_QUALITY = 55; // WebP (fallback for older phones)
+export const HERO_AVIF_QUALITY = 40; // AVIF: ~40% smaller than WebP at the same look on phones
+export type HeroFormat = "avif" | "webp";
 export type HeroWidth = (typeof HERO_WIDTHS)[number];
 
 /** Storage key of one resized copy. `version` changes on every upload, so URLs can be cached forever. */
-export function heroImageKey(slideId: string, version: string, width: number): string {
-  return `hero/${slideId}/${version}-${width}.webp`;
+export function heroImageKey(slideId: string, version: string, width: number, format: HeroFormat = "webp"): string {
+  return `hero/${slideId}/${version}-${width}.${format}`;
 }
 
 /** Public URL of one resized copy, served by /images/hero/[id]/[file]. */
-export function heroImageUrl(slideId: string, version: string, width: number): string {
-  return `/images/hero/${slideId}/${version}-${width}.webp`;
+export function heroImageUrl(slideId: string, version: string, width: number, format: HeroFormat = "webp"): string {
+  return `/images/hero/${slideId}/${version}-${width}.${format}`;
 }
 
-export function heroSrcSet(slideId: string, version: string): string {
-  return HERO_WIDTHS.map((w) => `${heroImageUrl(slideId, version, w)} ${w}w`).join(", ");
+export function heroSrcSet(slideId: string, version: string, format: HeroFormat = "webp"): string {
+  return HERO_WIDTHS.map((w) => `${heroImageUrl(slideId, version, w, format)} ${w}w`).join(", ");
 }
 
 // ── Built-in photos (used until admins upload their own under Admin → Home photos) ──
@@ -31,11 +34,12 @@ export const DEFAULT_HERO_PHOTOS: readonly DefaultHeroPhoto[] = [
   { name: "4-youth-gathering", alt: "Young people of the congregation smiling together at an outdoor youth gathering", focusY: 0.42 },
 ];
 
-export function defaultHeroUrl(name: string, width: number): string {
-  return `/hero/${name}-${width}.webp`;
+export function defaultHeroUrl(name: string, width: number, format: HeroFormat = "webp"): string {
+  return `/hero/${name}-${width}.${format}`;
 }
 
-export type CarouselSlide = { id: string; alt: string; src: string; srcSet: string };
+/** srcSet is WebP; avifSrcSet (when present) is offered first through <picture>. */
+export type CarouselSlide = { id: string; alt: string; src: string; srcSet: string; avifSrcSet?: string };
 
 export function defaultHeroSlides(): CarouselSlide[] {
   return DEFAULT_HERO_PHOTOS.map((p) => ({
@@ -43,11 +47,13 @@ export function defaultHeroSlides(): CarouselSlide[] {
     alt: p.alt,
     src: defaultHeroUrl(p.name, 960),
     srcSet: HERO_WIDTHS.map((w) => `${defaultHeroUrl(p.name, w)} ${w}w`).join(", "),
+    avifSrcSet: HERO_WIDTHS.map((w) => `${defaultHeroUrl(p.name, w, "avif")} ${w}w`).join(", "),
   }));
 }
 
 // ── The Rector's portrait (welcome section) ──
 // Original: assets/people/rector.png (1124×1399, transparent). `npm run hero` writes public/hero/rector-<w>.webp.
-export const RECTOR_WIDTHS = [320, 640] as const;
+export const RECTOR_WIDTHS = [320, 480, 640] as const;
 export const RECTOR_SIZE = { width: 1124, height: 1399 };
-export const rectorSrcSet = () => RECTOR_WIDTHS.map((w) => `/hero/rector-${w}.webp ${w}w`).join(", ");
+export const rectorSrcSet = (format: HeroFormat = "webp") =>
+  RECTOR_WIDTHS.map((w) => `/hero/rector-${w}.${format} ${w}w`).join(", ");

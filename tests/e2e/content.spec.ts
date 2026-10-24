@@ -217,7 +217,7 @@ test("home photos: uploaded, resized, and only the first one downloads with the 
   await expectNoAxeViolations(page);
 
   const response = await page.request.get(photoRequests[0]);
-  expect(response.headers()["content-type"]).toBe("image/webp");
+  expect(response.headers()["content-type"]).toMatch(/^image\/(avif|webp)$/);
   expect(response.headers()["cache-control"]).toContain("immutable");
 
   await page.getByRole("button", { name: "Next photo" }).click();

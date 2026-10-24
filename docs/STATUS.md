@@ -38,7 +38,7 @@
 - New editable "About us" text under Site content.
 - **Welcome section** under the slider (from the congregation's design): the Rector's portrait (built-in, `assets/people/rector.png` → `npm run hero`), "Rector: Shephard Liswaniso", the heading and the framed welcome message; all texts editable under Site content → Home page welcome.
 - **Footer** from the design: Azure band with emblem, "New Apostolic Church / UNZA Congregation", YouTube · TikTok · Facebook · WhatsApp icons (shown when a link is set; WhatsApp = the congregation's group link) and Privacy policy · Terms of use (`/terms`, starting text for leadership to review).
-- Home page critical path is now ~46–48 KB of the 50 KB budget (first slider photo 16 KB, Rector portrait 10 KB). The video thumbnail loads only when scrolled near. Anything new above the fold needs a size check.
+- Home page budget, measured like a real phone (360px at 2× density, as Lighthouse does): critical path ~35 KB of 50, first visit ~179 KB (Lighthouse ~189 KB) of 200. Photos are served as AVIF (WebP fallback); the slider's first photo is 16 KB; the Rector's portrait and the video thumbnail load only when scrolled near. The framework's JavaScript (~145 KB) is most of the first visit, so anything new near the top of the home page needs a size check.
 
 ## Decisions made
 

@@ -1,3 +1,4 @@
+import { NearPicture } from "@/components/public/near-picture";
 import { Prose } from "@/components/public/ui";
 import { RECTOR_SIZE, rectorSrcSet } from "@/lib/hero";
 
@@ -8,23 +9,22 @@ type Welcome = { title: string; body: string; messageTitle: string; leaderRole: 
  * portrait and name card, the heading, and the framed welcome message. Texts are edited under
  * Admin → Site content → Home page welcome.
  * Contrast: Azure (azure-500) is only used for text of 24px and more; the message is azure-900.
+ * Phones show the message first and load the portrait as it scrolls into view (data budget).
  */
 export function WelcomeSection({ welcome, portraitAlt }: { welcome: Welcome; portraitAlt: string }) {
   return (
     <section aria-labelledby="welcome-title" className="mx-auto grid max-w-6xl gap-8 px-4 pb-4 pt-10 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:px-6">
-      <figure className="mx-auto w-full max-w-sm md:max-w-none">
+      <figure className="order-2 mx-auto w-full max-w-sm md:order-1 md:max-w-none">
         <div className="overflow-hidden rounded-2xl border-2 border-azure-500 bg-white px-6 pt-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/hero/rector-640.webp"
-            srcSet={rectorSrcSet()}
+          <NearPicture
+            src="/hero/rector-480.webp"
+            srcSet={rectorSrcSet("webp")}
+            avifSrcSet={rectorSrcSet("avif")}
             sizes="(min-width: 768px) 320px, min(320px, 85vw)"
             width={RECTOR_SIZE.width}
             height={RECTOR_SIZE.height}
             alt={portraitAlt}
-            loading="lazy"
-            decoding="async"
-            className="mx-auto h-auto w-full max-w-xs"
+            className="mx-auto w-full max-w-xs"
           />
         </div>
         <figcaption className="mx-4 rounded-b-lg border-4 border-t-0 border-azure-500 bg-white px-4 py-3 text-center text-2xl shadow-sm">
@@ -33,7 +33,7 @@ export function WelcomeSection({ welcome, portraitAlt }: { welcome: Welcome; por
         </figcaption>
       </figure>
 
-      <div className="space-y-6">
+      <div className="order-1 space-y-6 md:order-2">
         <div className="text-center">
           <h1 id="welcome-title" className="text-4xl font-bold uppercase leading-tight tracking-tight text-azure-500 sm:text-5xl">
             {welcome.title}

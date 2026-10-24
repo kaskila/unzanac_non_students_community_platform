@@ -46,7 +46,13 @@ export default async function HomePage() {
   ]);
   // Admins' uploads (Admin → Home photos) replace the built-in congregation photos.
   const heroSlides: CarouselSlide[] = uploaded.length
-    ? uploaded.map((s) => ({ id: s.id, alt: s.alt, src: heroImageUrl(s.id, s.version, 960), srcSet: heroSrcSet(s.id, s.version) }))
+    ? uploaded.map((s) => ({
+        id: s.id,
+        alt: s.alt,
+        src: heroImageUrl(s.id, s.version, 960),
+        srcSet: heroSrcSet(s.id, s.version),
+        avifSrcSet: heroSrcSet(s.id, s.version, "avif"),
+      }))
     : defaultHeroSlides();
   const shown = [...announcements.filter((a) => a.pinned), ...announcements.filter((a) => !a.pinned).slice(0, LATEST_ANNOUNCEMENTS)];
 

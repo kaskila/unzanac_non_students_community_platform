@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { CarouselSlide } from "@/lib/hero";
 
 const INTERVAL_MS = 6000;
+const SIZES = "(min-width: 1152px) 1152px, 100vw";
 const PRELOAD_MS = 1500; // fetch the next photo this long before it slides in
 
 const REDUCE_MOTION = "(prefers-reduced-motion: reduce)";
@@ -99,18 +100,20 @@ export function HeroCarousel({ slides, labels }: { slides: CarouselSlide[]; labe
             className="aspect-[16/7] w-full shrink-0 snap-start bg-azure-100"
           >
             {loaded.has(i) && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={slide.src}
-                srcSet={slide.srcSet}
-                sizes="(min-width: 1152px) 1152px, 100vw"
-                alt={slide.alt}
-                width={960}
-                height={420}
-                fetchPriority={i === 0 ? "high" : undefined}
-                decoding="async"
-                className="h-full w-full object-cover"
-              />
+              <picture>
+                {slide.avifSrcSet && <source type="image/avif" srcSet={slide.avifSrcSet} sizes={SIZES} />}
+                <img
+                  src={slide.src}
+                  srcSet={slide.srcSet}
+                  sizes={SIZES}
+                  alt={slide.alt}
+                  width={960}
+                  height={420}
+                  fetchPriority={i === 0 ? "high" : undefined}
+                  decoding="async"
+                  className="h-full w-full object-cover"
+                />
+              </picture>
             )}
           </div>
         ))}
