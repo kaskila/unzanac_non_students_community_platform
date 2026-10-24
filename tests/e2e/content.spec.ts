@@ -33,8 +33,13 @@ async function expectNoAxeViolations(page: Page) {
 }
 
 test("journey 1: an admin publishes an announcement and it appears on the home page", async ({ page }) => {
-  await admin.getByRole("navigation", { name: "Admin menu" }).getByRole("link", { name: "Announcements" }).click();
+  const adminMenu = admin.getByRole("navigation", { name: "Admin menu" });
+  await adminMenu.getByRole("link", { name: "Announcements" }).click();
   await expect(admin.getByRole("heading", { level: 1, name: "Announcements" })).toBeVisible();
+  // One row of tabs: the current one is marked, and the tab row (not the page) scrolls on a phone.
+  await expect(adminMenu.getByRole("link", { name: "Announcements" })).toHaveAttribute("aria-current", "page");
+  await expect(adminMenu.getByRole("list", { name: "Website" })).toBeAttached();
+  expect(await admin.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
   await admin.getByRole("link", { name: "New announcement" }).click();
   await expect(admin.getByRole("heading", { level: 1, name: "New announcement" })).toBeVisible();
 

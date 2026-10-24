@@ -84,7 +84,10 @@
       "content": "Site content",
       "media": "Media",
       "resources": "Resources",
-      "homePhotos": "Home photos"
+      "homePhotos": "Home photos",
+      "groupContent": "Content",
+      "groupWebsite": "Website",
+      "groupPeople": "People"
     },
     "login": {
       "title": "Admin sign in",
