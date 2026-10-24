@@ -69,5 +69,5 @@
 
 - **Stale public page after a save, under concurrent traffic:** if a cached page (e.g. the home page) is being re-rendered at the moment an admin saves, that render can finish after `updateTag()` and keep the old content until the next 5-minute refresh. Seen only when E2E specs load "/" in parallel; tests use `gotoFresh()`. Fix to investigate: a second `revalidateTag` shortly after the save, or a shorter cache life for the home page.
 
-- `npm audit` flags high-severity issues in Prisma CLI's bundled MySQL driver and ESLint dependencies. They aren't in the app's runtime; Dependabot will pick up the fixes.
+- Security: Next.js upgraded 16.4.0 → **16.4.3** on 24 Oct 2026 (fixes a critical remote-code-execution advisory in `use cache`, plus image-optimisation RCE and a server-action DoS). `npm audit fix` also cleared the Prisma CLI dependency advisories: `npm audit` reports 0 vulnerabilities. Next.js now stops builds when the installed version has a known advisory, so keep it patched (Dependabot is on).
 - `experimental.authInterrupts` (for 403 pages) is still experimental in Next.js 16. Recheck on upgrades.
