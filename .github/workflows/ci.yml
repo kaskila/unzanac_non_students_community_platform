@@ -69,7 +69,7 @@ jobs:
           npm run start -- -p 3100 &
           npx wait-on@8 http://localhost:3100
           npx @lhci/cli@0.15.1 autorun
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
