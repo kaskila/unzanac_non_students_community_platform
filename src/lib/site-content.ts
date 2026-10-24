@@ -6,6 +6,9 @@ import { z } from "zod";
 import { normalizePhone } from "@/lib/phone";
 import { CHANNEL_ID_PATTERN } from "@/lib/video-links";
 
+/** The church's spot, from the congregation's Google Maps link (maps.app.goo.gl/x1rju4fHfrWR29yJ9). */
+export const CHURCH_COORDINATES = { lat: "-15.390551", lng: "28.327913" };
+
 const text = (max: number) => z.string().trim().max(max);
 const optionalUrl = z
   .string()
@@ -29,7 +32,22 @@ const contact = z.object({
 
 export const SITE_CONTENT_SCHEMAS = {
   hero: z.object({ title: text(80).min(1), body: text(300).min(1) }),
-  location: z.object({ name: text(100).min(1), address: text(200), mapUrl: optionalUrl }),
+  location: z.object({
+    name: text(100).min(1),
+    address: text(200),
+    mapUrl: optionalUrl,
+    // Church finder map. Defaults keep rows saved before these fields existed valid.
+    latitude: z
+      .string()
+      .trim()
+      .default(CHURCH_COORDINATES.lat)
+      .refine((v) => v === "" || (Number.isFinite(Number(v)) && Math.abs(Number(v)) <= 90), "latitude"),
+    longitude: z
+      .string()
+      .trim()
+      .default(CHURCH_COORDINATES.lng)
+      .refine((v) => v === "" || (Number.isFinite(Number(v)) && Math.abs(Number(v)) <= 180), "longitude"),
+  }),
   visit: z.object({ body: text(4000).min(1) }),
   about: z.object({ body: text(6000).min(1) }),
   contacts: z.object({ items: z.array(contact).max(8) }),
@@ -63,7 +81,9 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
   location: {
     name: "UNZANAC church",
     address: "", // Phase 0 content pack: venue and directions
-    mapUrl: "",
+    mapUrl: "https://maps.app.goo.gl/x1rju4fHfrWR29yJ9",
+    latitude: CHURCH_COORDINATES.lat,
+    longitude: CHURCH_COORDINATES.lng,
   },
   visit: {
     body: [

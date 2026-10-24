@@ -97,3 +97,21 @@ test("visitors who ask for less motion get no slideshow", async ({ browser }) =>
   await expect(slider.getByRole("img")).toHaveCount(1);
   await context.close();
 });
+
+test("Church finder shows a zoomable map of the church and opens directions in Maps", async ({ page }) => {
+  // Keep the test offline: the map itself comes from Google.
+  await page.route(/google\.com|gstatic\.com|googleapis\.com/, (route) => route.abort());
+  await page.goto("/");
+  await page.getByRole("link", { name: "Church finder" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Church finder" })).toBeVisible();
+  await expect(page.locator("iframe")).toHaveAttribute("src", "https://www.google.com/maps?q=-15.390551,28.327913&z=17&output=embed");
+  await expect(page.getByRole("link", { name: "Get directions" })).toHaveAttribute(
+    "href",
+    "https://www.google.com/maps/dir/?api=1&destination=-15.390551,28.327913",
+  );
+  await expect(page.getByRole("link", { name: "Open in Google Maps" })).toHaveAttribute("href", "https://maps.app.goo.gl/x1rju4fHfrWR29yJ9");
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+  const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).exclude("iframe").analyze();
+  expect(results.violations).toEqual([]);
+});

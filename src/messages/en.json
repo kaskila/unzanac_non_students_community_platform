@@ -254,7 +254,9 @@
         "upload_failed": "The upload failed. Check your connection and try again.",
         "alt_required": "Describe the photo first (it is read out to blind visitors).",
         "photo_type": "Use a JPG, PNG or WebP photo.",
-        "photo_unreadable": "This photo couldn't be read. Try exporting it again as JPG."
+        "photo_unreadable": "This photo couldn't be read. Try exporting it again as JPG.",
+        "latitude": "Enter a latitude between -90 and 90, e.g. -15.390551.",
+        "longitude": "Enter a longitude between -180 and 180, e.g. 28.327913."
       }
     },
     "announcements": {
@@ -411,12 +413,15 @@
       },
       "location": {
         "title": "Church location",
-        "intro": "Used on the visit page and as the default venue for new events.",
+        "intro": "Used on the Church finder map, the visit page and as the default venue for new events.",
         "name": "Name",
         "address": "Address or directions",
         "addressHint": "e.g. Great East Road, opposite the UNZA main gate",
         "mapUrl": "Map link",
-        "mapUrlHint": "A Google Maps link starting with https://"
+        "mapUrlHint": "A Google Maps link starting with https://",
+        "coordinatesHelp": "Map position for the Church finder. In Google Maps, press and hold (or right-click) the church: the two numbers shown are the latitude and longitude.",
+        "latitude": "Latitude",
+        "longitude": "Longitude"
       },
       "visit": {
         "title": "\"Plan your visit\" page",
@@ -676,7 +681,8 @@
     "whereTitle": "Where to find us",
     "directions": "Directions",
     "timesTitle": "Service times",
-    "questionsTitle": "Questions?"
+    "questionsTitle": "Questions?",
+    "mapLink": "Show on the map"
   },
   "Privacy": {
     "title": "Privacy notice",
@@ -723,7 +729,8 @@
     "whereTitle": "Where to find us",
     "directions": "Directions",
     "planVisit": "Plan your visit",
-    "followTitle": "Follow us"
+    "followTitle": "Follow us",
+    "mapLink": "Show on the map"
   },
   "Search": {
     "title": "Search",
@@ -737,5 +744,15 @@
       "videos": "Videos",
       "resources": "Resources"
     }
+  },
+  "ChurchFinder": {
+    "title": "Church finder",
+    "intro": "Find the UNZA congregation of the New Apostolic Church. Pinch or use + and − to zoom the map.",
+    "mapTitle": "Map showing {name}",
+    "directions": "Get directions",
+    "openMaps": "Open in Google Maps",
+    "dataNote": "The map comes from Google Maps and uses some mobile data. \"Get directions\" opens the Maps app on your phone.",
+    "timesTitle": "Service times",
+    "planVisit": "First time? Plan your visit"
   }
 }

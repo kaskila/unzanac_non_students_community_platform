@@ -35,11 +35,9 @@ export default async function ContactPage() {
         <p className="font-semibold">{location.name}</p>
         {location.address && <p>{location.address}</p>}
         <p className="flex flex-wrap gap-x-5">
-          {location.mapUrl && (
-            <a href={location.mapUrl} rel="noopener" className="inline-flex min-h-11 items-center">
-              {t("directions")}
-            </a>
-          )}
+          <NavLink href="/church-finder" className="inline-flex min-h-11 items-center">
+            {t("mapLink")}
+          </NavLink>
           <NavLink href="/visit" className="inline-flex min-h-11 items-center">
             {t("planVisit")}
           </NavLink>

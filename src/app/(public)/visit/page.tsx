@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { NavLink } from "@/components/public/nav-link";
 import { ScheduleList } from "@/components/public/schedule";
 import { ContactList, PageHeader, Prose, pub } from "@/components/public/ui";
 import { getRegularSchedule, getSiteContent } from "@/server/public";
@@ -23,11 +24,9 @@ export default async function VisitPage() {
         </h2>
         <p className="font-semibold">{location.name}</p>
         {location.address && <p>{location.address}</p>}
-        {location.mapUrl && (
-          <a href={location.mapUrl} rel="noopener" className={pub.secondary}>
-            {t("directions")}
-          </a>
-        )}
+        <NavLink href="/church-finder" className={pub.secondary}>
+          {t("mapLink")}
+        </NavLink>
       </section>
 
       {schedule.length > 0 && (

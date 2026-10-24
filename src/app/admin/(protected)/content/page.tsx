@@ -48,6 +48,11 @@ export default async function SiteContentPage() {
         <TextField name="name" label={t("location.name")} maxLength={100} defaultValue={site.location.name} />
         <TextField name="address" label={t("location.address")} hint={t("location.addressHint")} maxLength={200} defaultValue={site.location.address} />
         <TextField name="mapUrl" type="url" inputMode="url" label={t("location.mapUrl")} hint={t("location.mapUrlHint")} defaultValue={site.location.mapUrl} />
+        <p className={ui.muted}>{t("location.coordinatesHelp")}</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextField name="latitude" inputMode="numeric" label={t("location.latitude")} maxLength={20} defaultValue={site.location.latitude} />
+          <TextField name="longitude" inputMode="numeric" label={t("location.longitude")} maxLength={20} defaultValue={site.location.longitude} />
+        </div>
       </>)}
 
       {section("visit", <>

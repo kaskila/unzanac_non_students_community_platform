@@ -673,7 +673,7 @@ model AuditLog {
 - Public forms are protected by honeypot, IP rate limits and Turnstile.
 - No personal data in logs. Sentry strips request bodies and cookies.
 - Uploads: file types checked against an allow-list using the file's content; HTML, SVG and executables are rejected; files are always served as downloads from R2, never from the site's own domain; the bucket is private and access goes through short-lived signed URLs.
-- Content-Security-Policy allows only `youtube-nocookie.com` in frames, `i.ytimg.com` for images, and the R2 host as a redirect target.
+- Content-Security-Policy allows only `youtube-nocookie.com` and `www.google.com` (the Church finder map) in frames, `i.ytimg.com` for images, and the R2 host as a redirect target.
 - Dependabot and GitHub secret scanning are on. `npm audit` runs in CI.
 - Secrets live only in the host's environment variables, and `.env.example` documents them.
 

@@ -53,7 +53,7 @@ export async function SiteHeader() {
         </NavLink>
         <ul className="flex flex-wrap gap-x-6">
           <li>
-            <NavLink href="/visit#where-title" className="inline-flex min-h-11 items-center gap-2 uppercase text-azure-700 no-underline hover:underline">
+            <NavLink href="/church-finder" className="inline-flex min-h-11 items-center gap-2 uppercase text-azure-700 no-underline hover:underline">
               <PinIcon />
               {t("nav.churchFinder")}
             </NavLink>
