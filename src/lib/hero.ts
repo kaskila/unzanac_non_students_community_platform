@@ -2,7 +2,7 @@
 export const HERO_WIDTHS = [480, 960, 1440] as const;
 /** Banner shape (height / width), like the mockup. */
 export const HERO_ASPECT = 7 / 16;
-export const HERO_QUALITY = 60;
+export const HERO_QUALITY = 55;
 export type HeroWidth = (typeof HERO_WIDTHS)[number];
 
 /** Storage key of one resized copy. `version` changes on every upload, so URLs can be cached forever. */
@@ -45,3 +45,9 @@ export function defaultHeroSlides(): CarouselSlide[] {
     srcSet: HERO_WIDTHS.map((w) => `${defaultHeroUrl(p.name, w)} ${w}w`).join(", "),
   }));
 }
+
+// ── The Rector's portrait (welcome section) ──
+// Original: assets/people/rector.png (1124×1399, transparent). `npm run hero` writes public/hero/rector-<w>.webp.
+export const RECTOR_WIDTHS = [320, 640] as const;
+export const RECTOR_SIZE = { width: 1124, height: 1399 };
+export const rectorSrcSet = () => RECTOR_WIDTHS.map((w) => `/hero/rector-${w}.webp ${w}w`).join(", ");

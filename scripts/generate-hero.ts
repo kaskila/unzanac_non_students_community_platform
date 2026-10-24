@@ -1,8 +1,9 @@
-// Builds the home page's built-in banner photos: assets/hero-photos/<name>.jpg → public/hero/<name>-<width>.webp
-// Run with `npm run hero` after adding or replacing a photo (and list it in DEFAULT_HERO_PHOTOS).
+// Builds the home page's built-in images (run `npm run hero` after replacing one):
+//   assets/hero-photos/<name>.jpg → public/hero/<name>-<width>.webp   (slider banners, DEFAULT_HERO_PHOTOS)
+//   assets/people/rector.png      → public/hero/rector-<width>.webp   (welcome section, transparent background)
 import { mkdir, stat } from "node:fs/promises";
 import sharp from "sharp";
-import { DEFAULT_HERO_PHOTOS, HERO_ASPECT, HERO_QUALITY, HERO_WIDTHS } from "../src/lib/hero";
+import { DEFAULT_HERO_PHOTOS, HERO_ASPECT, HERO_QUALITY, HERO_WIDTHS, RECTOR_WIDTHS } from "../src/lib/hero";
 
 async function main() {
   await mkdir("public/hero", { recursive: true });
@@ -25,7 +26,18 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+/** The Rector's cut-out portrait for the welcome section: keeps transparency, no cropping. */
+async function rector() {
+  for (const w of RECTOR_WIDTHS) {
+    const out = `public/hero/rector-${w}.webp`;
+    await sharp("assets/people/rector.png").resize({ width: w }).webp({ quality: 60, alphaQuality: 70 }).toFile(out);
+    console.log(`${out}  ${Math.round((await stat(out)).size / 1024)} KB`);
+  }
+}
+
+main()
+  .then(rector)
+  .catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });

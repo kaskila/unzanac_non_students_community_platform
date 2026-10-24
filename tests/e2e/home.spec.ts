@@ -10,7 +10,7 @@ const BUDGET = {
 
 test("home page shows the welcome, committees and YouTube link", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1, name: "Welcome to UNZANAC" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Welcome to our congregation" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Committees" })).toBeVisible();
   await expect(page.getByRole("listitem").filter({ hasText: "Secretariat" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Watch on YouTube" })).toHaveAttribute(
@@ -114,4 +114,19 @@ test("Church finder shows a zoomable map of the church and opens directions in M
   expect(overflow).toBeLessThanOrEqual(0);
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).exclude("iframe").analyze();
   expect(results.violations).toEqual([]);
+});
+
+test("welcome section with the Rector, and the footer's social and policy links", async ({ page }) => {
+  await page.goto("/");
+  const welcome = page.getByRole("region", { name: "Welcome to our congregation" });
+  await expect(welcome.getByRole("img", { name: "Shephard Liswaniso, Rector of the UNZA congregation" })).toBeVisible();
+  await expect(welcome.getByRole("heading", { level: 2, name: "Welcome message" })).toBeVisible();
+  await expect(welcome).toContainText("Warm greetings in the name of our Lord Jesus Christ");
+  await expect(welcome).toContainText("Rector: Shephard Liswaniso");
+
+  const footer = page.getByRole("contentinfo");
+  await expect(footer.getByRole("link", { name: "WhatsApp group" })).toHaveAttribute("href", "https://chat.whatsapp.com/JgRvaIKqk5C30pzl9ImhAE");
+  await expect(footer.getByRole("link", { name: "YouTube" })).toHaveAttribute("href", "https://www.youtube.com/@UNZANACMUSICDEPT");
+  await footer.getByRole("link", { name: "Terms of use" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Terms of use" })).toBeVisible();
 });

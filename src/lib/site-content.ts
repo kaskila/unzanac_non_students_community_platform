@@ -6,6 +6,9 @@ import { z } from "zod";
 import { normalizePhone } from "@/lib/phone";
 import { CHANNEL_ID_PATTERN } from "@/lib/video-links";
 
+/** The welcome section's defaults (from the congregation's design). */
+const WELCOME = { messageTitle: "Welcome message", leaderRole: "Rector", leaderName: "Shephard Liswaniso" };
+
 /** The church's spot, from the congregation's Google Maps link (maps.app.goo.gl/x1rju4fHfrWR29yJ9). */
 export const CHURCH_COORDINATES = { lat: "-15.390551", lng: "28.327913" };
 
@@ -31,7 +34,15 @@ const contact = z.object({
 });
 
 export const SITE_CONTENT_SCHEMAS = {
-  hero: z.object({ title: text(80).min(1), body: text(300).min(1) }),
+  // Home welcome section (under the photo slider): heading, the Rector's welcome message, and the
+  // name card under the portrait. Defaults keep rows saved before these fields existed valid.
+  hero: z.object({
+    title: text(80).min(1),
+    body: text(1500).min(1),
+    messageTitle: text(40).min(1).default(WELCOME.messageTitle),
+    leaderRole: text(40).min(1).default(WELCOME.leaderRole),
+    leaderName: text(80).min(1).default(WELCOME.leaderName),
+  }),
   location: z.object({
     name: text(100).min(1),
     address: text(200),
@@ -60,9 +71,11 @@ export const SITE_CONTENT_SCHEMAS = {
       .default("")
       .refine((v) => v === "" || CHANNEL_ID_PATTERN.test(v), "channel_id"),
     facebook: optionalUrl,
-    whatsappChannel: optionalUrl,
+    whatsappChannel: optionalUrl, // WhatsApp group or channel invite link
+    tiktok: optionalUrl.default(""),
   }),
   verse: z.object({ text: text(400), reference: text(60) }),
+  terms: z.object({ body: text(8000).min(1) }),
 } as const;
 
 export type SiteContentKey = keyof typeof SITE_CONTENT_SCHEMAS;
@@ -75,8 +88,19 @@ export function isSiteContentKey(value: unknown): value is SiteContentKey {
 
 export const DEFAULT_SITE_CONTENT: SiteContent = {
   hero: {
-    title: "Welcome to UNZANAC",
-    body: "Whether you live, work or study near UNZA, or are visiting for the first time, you belong here.",
+    title: "Welcome to our congregation",
+    body: [
+      "Warm greetings in the name of our Lord Jesus Christ.",
+      "",
+      "Welcome to UNZA Congregation. Whether you are a student, member, or visitor, you are warmly welcomed into our fellowship.",
+      "",
+      "May our divine services and fellowship strengthen your faith, inspire love and unity, and prepare us for the return of Christ.",
+      "",
+      "May God bless you abundantly.",
+    ].join("\n"),
+    messageTitle: WELCOME.messageTitle,
+    leaderRole: WELCOME.leaderRole,
+    leaderName: WELCOME.leaderName,
   },
   location: {
     name: "UNZANAC church",
@@ -107,8 +131,37 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     ].join("\n"),
   },
   contacts: { items: [] },
-  social: { youtube: "https://www.youtube.com/@UNZANACMUSICDEPT", youtubeChannelId: "", facebook: "", whatsappChannel: "" },
+  social: {
+    youtube: "https://www.youtube.com/@UNZANACMUSICDEPT",
+    youtubeChannelId: "",
+    facebook: "",
+    whatsappChannel: "https://chat.whatsapp.com/JgRvaIKqk5C30pzl9ImhAE",
+    tiktok: "",
+  },
   verse: { text: "", reference: "" },
+  terms: {
+    // Starting text for church leadership to review (Admin → Site content → Terms of use).
+    body: [
+      "These terms apply to this website of the UNZA congregation of the New Apostolic Church in Zambia.",
+      "",
+      "**Using the website**",
+      "- The site shares news, services, activities, videos and materials of the congregation. Please use it respectfully and only for lawful purposes.",
+      "- Don't try to break into the admin area, overload the site or upload harmful files.",
+      "",
+      "**Content**",
+      "- Texts, photos and videos belong to the congregation or to the New Apostolic Church. The church emblem belongs to the New Apostolic Church.",
+      "- You may share links and download materials for personal and congregation use. Please ask before republishing them elsewhere.",
+      "",
+      "**Other websites**",
+      "- Links to YouTube, Facebook, TikTok, WhatsApp and Google Maps open services with their own terms and privacy rules.",
+      "",
+      "**Your information**",
+      "- How we handle personal information is explained in the [privacy notice](/privacy).",
+      "",
+      "**Changes and questions**",
+      "- These terms may be updated from time to time. For questions, see the [contact page](/contact).",
+    ].join("\n"),
+  },
 };
 
 /** Parse stored JSON for a key; invalid or missing values fall back to the default. */

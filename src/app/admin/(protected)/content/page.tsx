@@ -41,7 +41,12 @@ export default async function SiteContentPage() {
 
       {section("hero", <>
         <TextField name="title" label={t("hero.heading")} hint={t("hero.headingHint")} maxLength={80} defaultValue={site.hero.title} />
-        <TextArea id="field-hero-body" name="body" label={t("hero.body")} rows={3} maxLength={300} defaultValue={site.hero.body} />
+        <TextField name="messageTitle" label={t("hero.messageTitle")} maxLength={40} defaultValue={site.hero.messageTitle} />
+        <TextArea id="field-hero-body" name="body" label={t("hero.body")} hint={t("markdownHint")} rows={8} maxLength={1500} defaultValue={site.hero.body} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextField name="leaderRole" label={t("hero.leaderRole")} maxLength={40} defaultValue={site.hero.leaderRole} />
+          <TextField name="leaderName" label={t("hero.leaderName")} maxLength={80} defaultValue={site.hero.leaderName} />
+        </div>
       </>)}
 
       {section("location", <>
@@ -90,7 +95,12 @@ export default async function SiteContentPage() {
         <TextField name="youtube" type="url" inputMode="url" label={t("social.youtube")} defaultValue={site.social.youtube} />
         <TextField name="youtubeChannelId" label={t("social.youtubeChannelId")} hint={t("social.youtubeChannelIdHint")} maxLength={30} defaultValue={site.social.youtubeChannelId} />
         <TextField name="facebook" type="url" inputMode="url" label={t("social.facebook")} hint={t("social.facebookHint")} defaultValue={site.social.facebook} />
-        <TextField name="whatsappChannel" type="url" inputMode="url" label={t("social.whatsappChannel")} defaultValue={site.social.whatsappChannel} />
+        <TextField name="whatsappChannel" type="url" inputMode="url" label={t("social.whatsappChannel")} hint={t("social.whatsappHint")} defaultValue={site.social.whatsappChannel} />
+        <TextField name="tiktok" type="url" inputMode="url" label={t("social.tiktok")} defaultValue={site.social.tiktok} />
+      </>)}
+
+      {section("terms", <>
+        <TextArea id="field-terms-body" name="body" label={t("terms.body")} hint={t("markdownHint")} rows={14} maxLength={8000} defaultValue={site.terms.body} />
       </>)}
 
       {section("verse", <>

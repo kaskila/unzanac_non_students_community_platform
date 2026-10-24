@@ -53,14 +53,20 @@
     "nextPhoto": "Next photo",
     "photoOf": "Photo {n} of {count}",
     "pausePhotos": "Pause the slideshow",
-    "playPhotos": "Play the slideshow"
+    "playPhotos": "Play the slideshow",
+    "rectorPortrait": "{name}, {role} of the UNZA congregation"
   },
   "Footer": {
+    "emblemAlt": "New Apostolic Church emblem",
+    "church": "New Apostolic Church",
+    "congregation": "UNZA Congregation",
     "follow": "Follow us",
     "youtube": "YouTube",
+    "tiktok": "TikTok",
     "facebook": "Facebook",
-    "whatsappChannel": "WhatsApp channel",
-    "privacy": "Privacy notice"
+    "whatsappChannel": "WhatsApp group",
+    "privacy": "Privacy policy",
+    "terms": "Terms of use"
   },
   "Admin": {
     "title": "UNZANAC Admin",
@@ -409,10 +415,13 @@
       "markdownHint": "Use **bold**, *italic*, [link text](https://…) and lines starting with \"- \" for lists.",
       "hero": {
         "title": "Home page welcome",
-        "intro": "The large greeting at the top of the home page.",
+        "intro": "The welcome section under the photos: heading, welcome message and the name card under the Rector's portrait.",
         "heading": "Heading",
-        "headingHint": "Keep it short: it's shown in large text.",
-        "body": "Welcome text"
+        "headingHint": "Keep it short: it's shown in large capitals.",
+        "body": "Welcome message",
+        "messageTitle": "Message title",
+        "leaderRole": "Title under the portrait",
+        "leaderName": "Name under the portrait"
       },
       "location": {
         "title": "Church location",
@@ -446,9 +455,11 @@
         "youtube": "YouTube channel",
         "facebook": "Facebook page",
         "facebookHint": "Use the page's permanent address, not a share link (share links can expire).",
-        "whatsappChannel": "WhatsApp channel",
+        "whatsappChannel": "WhatsApp group or channel",
         "youtubeChannelId": "YouTube channel ID",
-        "youtubeChannelIdHint": "Starts with UC (YouTube Studio → Settings → Channel → Advanced settings). Used to import new uploads as drafts."
+        "youtubeChannelIdHint": "Starts with UC (YouTube Studio → Settings → Channel → Advanced settings). Used to import new uploads as drafts.",
+        "whatsappHint": "The invite link, e.g. https://chat.whatsapp.com/…",
+        "tiktok": "TikTok"
       },
       "verse": {
         "title": "Verse of the week",
@@ -469,6 +480,11 @@
       "about": {
         "title": "\"About us\" page",
         "intro": "Who the congregation is. Shown under About in the main menu.",
+        "body": "Text"
+      },
+      "terms": {
+        "title": "Terms of use",
+        "intro": "Shown at /terms and linked in the footer. Starting text: please have church leadership review it.",
         "body": "Text"
       }
     },
@@ -757,5 +773,8 @@
     "dataNote": "The map comes from Google Maps and uses some mobile data. \"Get directions\" opens the Maps app on your phone.",
     "timesTitle": "Service times",
     "planVisit": "First time? Plan your visit"
+  },
+  "Terms": {
+    "title": "Terms of use"
   }
 }

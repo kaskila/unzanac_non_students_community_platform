@@ -3,6 +3,7 @@ import { HeroCarousel } from "@/components/public/hero-carousel";
 import { NavLink } from "@/components/public/nav-link";
 import { ScheduleList } from "@/components/public/schedule";
 import { VideoPlayer } from "@/components/public/video";
+import { WelcomeSection } from "@/components/public/welcome";
 import { ContactList, OccurrenceBadges, pub, ShareOnWhatsApp, When } from "@/components/public/ui";
 import { formatBytes, kindLabel } from "@/lib/file-rules";
 import { defaultHeroSlides, heroImageUrl, heroSrcSet, type CarouselSlide } from "@/lib/hero";
@@ -48,7 +49,6 @@ export default async function HomePage() {
     ? uploaded.map((s) => ({ id: s.id, alt: s.alt, src: heroImageUrl(s.id, s.version, 960), srcSet: heroSrcSet(s.id, s.version) }))
     : defaultHeroSlides();
   const shown = [...announcements.filter((a) => a.pinned), ...announcements.filter((a) => !a.pinned).slice(0, LATEST_ANNOUNCEMENTS)];
-  const mapUrl = nextService?.event.mapUrl || site.location.mapUrl;
 
   return (
     <>
@@ -74,40 +74,32 @@ export default async function HomePage() {
           }}
         />
       )}
-      {/* With photos the welcome sits on white below them; without, on the Azure band. */}
-      <section className={heroSlides.length > 0 ? "" : "bg-azure-500"}>
-        <div className={`${pub.container} pb-8 pt-10`}>
-          {/* White on azure-500 is 3.27:1, so this title must stay >= 24px (text-4xl = 36px). */}
-          <h1 className={heroSlides.length > 0 ? pub.h1 : "text-4xl font-medium leading-tight tracking-tight text-white sm:text-5xl"}>
-            {site.hero.title}
-          </h1>
-          <div className={`mt-5 rounded-lg bg-white p-5 ${heroSlides.length > 0 ? "border border-line" : "shadow-sm"}`}>
-            <p>{site.hero.body}</p>
-            <h2 className="mt-4 text-lg font-bold text-azure-900">{t("nextServiceTitle")}</h2>
-            {nextService ? (
-              <div className="mt-1 space-y-1" data-testid="next-service">
-                <p className="font-semibold">
-                  <When start={nextService.occurrence.start} end={nextService.occurrence.end} />
-                </p>
-                <p>
-                  <NavLink href={`/events/${nextService.event.slug}`}>{nextService.event.title}</NavLink> · {nextService.event.venue}
-                </p>
-                <OccurrenceBadges cancelled={false} moved={nextService.occurrence.moved} note={nextService.occurrence.note} />
-                <p className="flex flex-wrap gap-x-5">
-                  <a href={`/events/${nextService.event.slug}/ics`} className="inline-flex min-h-11 items-center">
-                    {t("addToCalendar")}
-                  </a>
-                  {mapUrl && (
-                    <a href={mapUrl} rel="noopener" className="inline-flex min-h-11 items-center">
-                      {t("directions")}
-                    </a>
-                  )}
-                </p>
-              </div>
-            ) : (
-              <p className={pub.muted}>{t("nextServicePending")}</p>
-            )}
-          </div>
+      <WelcomeSection welcome={site.hero} portraitAlt={t("rectorPortrait", { role: site.hero.leaderRole, name: site.hero.leaderName })} />
+
+      <section aria-labelledby="next-service-title" className={`${pub.container} pt-6`}>
+        <div className="rounded-lg border border-line bg-white p-5">
+          <h2 id="next-service-title" className="text-lg font-bold text-azure-900">{t("nextServiceTitle")}</h2>
+          {nextService ? (
+            <div className="mt-1 space-y-1" data-testid="next-service">
+              <p className="font-semibold">
+                <When start={nextService.occurrence.start} end={nextService.occurrence.end} />
+              </p>
+              <p>
+                <NavLink href={`/events/${nextService.event.slug}`}>{nextService.event.title}</NavLink> · {nextService.event.venue}
+              </p>
+              <OccurrenceBadges cancelled={false} moved={nextService.occurrence.moved} note={nextService.occurrence.note} />
+              <p className="flex flex-wrap gap-x-5">
+                <a href={`/events/${nextService.event.slug}/ics`} className="inline-flex min-h-11 items-center">
+                  {t("addToCalendar")}
+                </a>
+                <NavLink href="/church-finder" className="inline-flex min-h-11 items-center">
+                  {t("directions")}
+                </NavLink>
+              </p>
+            </div>
+          ) : (
+            <p className={pub.muted}>{t("nextServicePending")}</p>
+          )}
         </div>
       </section>
 

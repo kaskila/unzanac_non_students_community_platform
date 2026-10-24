@@ -153,7 +153,7 @@ test("site content edits appear on the public site", async ({ page }) => {
   await expect(contactsSection.getByRole("link", { name: "+260 97 123 4567" })).toHaveAttribute("href", "tel:+260971234567");
   await expect(contactsSection.getByRole("link", { name: /WhatsApp/ })).toHaveAttribute("href", "https://wa.me/260971234567");
 
-  await page.getByRole("link", { name: "Privacy notice" }).click();
+  await page.getByRole("link", { name: "Privacy policy" }).click();
   await expect(page.getByText("Version 1, published")).toBeVisible();
   await expect(page.getByText("We collect only what the congregation needs.")).toBeVisible();
 });
@@ -211,7 +211,7 @@ test("home photos: uploaded, resized, and only the first one downloads with the 
   await gotoFresh(page, "/", () =>
     expect(page.getByRole("img", { name: "Members after the youth service" })).toBeVisible({ timeout: 1000 }),
   );
-  await expect(page.getByRole("heading", { level: 1, name: "Welcome to UNZANAC" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Welcome to our congregation" })).toBeVisible();
   await page.waitForLoadState("networkidle");
   expect(new Set(photoRequests.map((u) => u.split("/")[5])).size, "only the first photo loads").toBe(1);
   await expectNoAxeViolations(page);
@@ -242,6 +242,8 @@ test("every public page is accessible and fits a 360px screen", async ({ page })
     "/about",
     "/contact",
     "/search?q=youth",
+    "/terms",
+    "/church-finder",
   ]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
