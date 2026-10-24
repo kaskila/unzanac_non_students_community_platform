@@ -1,6 +1,5 @@
-import { NavLink } from "@/components/public/nav-link";
-
-export type SiteNavProps = Props;
+import { Suspense } from "react";
+import { CurrentMenuLink, MenuLink, menuLinkClass } from "@/components/public/current-site-nav";
 
 type Props = {
   links: { href: string; label: string }[];
@@ -8,13 +7,9 @@ type Props = {
 };
 
 // White text on brand Azure is 3.27:1, enough only for large text: menu text is 18.7px bold, the
-// smallest size WCAG counts as large (14pt bold), so 3:1 applies. Don't go smaller on this Azure. No hooks here: CurrentSiteNav (client) passes the current path, and the
-// header renders this without one as the Suspense fallback in the prerendered shell.
-const linkClass = "inline-flex min-h-11 items-center text-[18.7px] font-bold uppercase text-white no-underline";
-
-function isCurrent(pathname: string, href: string) {
-  return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
-}
+// smallest size WCAG counts as large (14pt bold), so 3:1 applies. Don't go smaller on this Azure.
+// The bar is static (prerendered); only each link's current-page mark is filled in per request.
+const linkClass = menuLinkClass;
 
 function SearchForm({ labels }: { labels: Props["labels"] }) {
   return (
@@ -40,21 +35,14 @@ function SearchForm({ labels }: { labels: Props["labels"] }) {
   );
 }
 
-export function SiteNav({ links, labels, pathname = null }: Props & { pathname?: string | null }) {
-  const items = links.map((link) => {
-    const current = pathname !== null && isCurrent(pathname, link.href);
-    return (
-      <li key={link.href}>
-        <NavLink
-          href={link.href}
-          aria-current={current ? "page" : undefined}
-          className={`${linkClass} ${current ? "underline decoration-2 underline-offset-8" : "hover:underline hover:underline-offset-8"}`}
-        >
-          {link.label}
-        </NavLink>
-      </li>
-    );
-  });
+export function SiteNav({ links, labels }: Props) {
+  const items = links.map((link) => (
+    <li key={link.href}>
+      <Suspense fallback={<MenuLink href={link.href} label={link.label} />}>
+        <CurrentMenuLink href={link.href} label={link.label} />
+      </Suspense>
+    </li>
+  ));
 
   return (
     <nav aria-label={labels.label} className="bg-azure-500 px-4 sm:px-6">

@@ -134,9 +134,11 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
   social: {
     youtube: "https://www.youtube.com/@UNZANACMUSICDEPT",
     youtubeChannelId: "",
-    facebook: "",
+    // A share link: replace it with the page's permanent address (facebook.com/<page>) when known,
+    // as share links can expire.
+    facebook: "https://www.facebook.com/share/1FG21v1J4q/",
     whatsappChannel: "https://chat.whatsapp.com/JgRvaIKqk5C30pzl9ImhAE",
-    tiktok: "",
+    tiktok: "https://www.tiktok.com/@unzanac1",
   },
   verse: { text: "", reference: "" },
   terms: {

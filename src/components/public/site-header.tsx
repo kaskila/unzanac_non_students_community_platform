@@ -1,7 +1,5 @@
-import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { NavLink } from "@/components/public/nav-link";
-import { CurrentSiteNav } from "@/components/public/current-site-nav";
 import { SiteNav } from "@/components/public/site-nav";
 
 function PinIcon() {
@@ -66,10 +64,7 @@ export async function SiteHeader() {
           </li>
         </ul>
       </div>
-      {/* The current page is only known per request; the shell shows the menu without the mark. */}
-      <Suspense fallback={<SiteNav links={links} labels={labels} />}>
-        <CurrentSiteNav links={links} labels={labels} />
-      </Suspense>
+      <SiteNav links={links} labels={labels} />
     </header>
   );
 }

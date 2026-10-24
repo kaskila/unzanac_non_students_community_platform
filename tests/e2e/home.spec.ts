@@ -127,6 +127,8 @@ test("welcome section with the Rector, and the footer's social and policy links"
   const footer = page.getByRole("contentinfo");
   await expect(footer.getByRole("link", { name: "WhatsApp group" })).toHaveAttribute("href", "https://chat.whatsapp.com/JgRvaIKqk5C30pzl9ImhAE");
   await expect(footer.getByRole("link", { name: "YouTube" })).toHaveAttribute("href", "https://www.youtube.com/@UNZANACMUSICDEPT");
+  await expect(footer.getByRole("link", { name: "TikTok" })).toHaveAttribute("href", "https://www.tiktok.com/@unzanac1");
+  await expect(footer.getByRole("link", { name: "Facebook" })).toHaveAttribute("href", "https://www.facebook.com/share/1FG21v1J4q/");
   await footer.getByRole("link", { name: "Terms of use" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Terms of use" })).toBeVisible();
 });
